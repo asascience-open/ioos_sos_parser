@@ -64,6 +64,22 @@ public class SensorModel {
 	public void setSensorHeight(Coordinate sensorHeight) {
 		this.sensorHeight = sensorHeight;
 	}
+	
+	public String sensorDataRecordToString(SensorDataRecords sensorDataRecord){
+		String strRep  ="";
+		if(sensorDataRecord != null){
+			List<SensorProperty> sensorData = sensorDataRecord.getModeledProperties();
+
+			if(sensorData != null){
+				for(SensorProperty modeledProp : sensorData){
+					strRep += "       " + modeledProp.getSensorType() + "  " + modeledProp.getSensorUnitOfMeasure() + "\n";
+
+				}
+			}
+			strRep += sensorDataRecord.toString();
+		}
+		return strRep;
+	}
 	public String toString() {
 		String strRep = "SensorID: " + sensorId + " Height: " + sensorHeight;
 		
@@ -77,7 +93,11 @@ public class SensorModel {
 				}
 			}
 			strRep += sensorDataRecord.toString();
+			
 		}
+		strRep += "Bin Def\n"+sensorDataRecordToString(binDefRecord);
+		strRep += sensorDataRecordToString(sensorDataRecord);
+	
 		return strRep;
 	}
 

@@ -533,9 +533,9 @@ public class SweDataRecordParser {
 							objectIndex ++;
 						}
 
-					}
+					
 					sensorRec.addSensorDataRecord(sensorData, 0);
-				
+					}
 			}
 		}
 	}
@@ -680,7 +680,8 @@ public class SweDataRecordParser {
 	private List<SensorProperty> parseQuantityField(Element quantityElem){
 		List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
 		List<QualityModel> qualityMod = null;
-		if(quantityElem != null && quantityElem.getName().equals(quantityTag)){
+		if(quantityElem != null && (quantityElem.getName().equals(quantityTag) ||
+				quantityElem.getName().equals(quantityRangeTag))){
 
 				SensorProperty sensorData = new SensorProperty();
 
@@ -694,7 +695,12 @@ public class SweDataRecordParser {
 				}
 				processNilValue(sensorData, quantityElem);
 				sensorData.setSensorType(sensorTypeDef);
-				sensorData.setPropertyType(PropertyType.QUANTITY);
+				
+				if(quantityElem.getName().equals(quantityTag))
+					sensorData.setPropertyType(PropertyType.QUANTITY);
+				else
+					sensorData.setPropertyType(PropertyType.QUANTITY_RANGE);
+
 				propertyList.add(sensorData);
 
 				// create a new record for each quality
