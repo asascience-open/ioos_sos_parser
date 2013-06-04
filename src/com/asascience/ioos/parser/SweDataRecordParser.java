@@ -3,6 +3,7 @@ package com.asascience.ioos.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -457,6 +458,7 @@ public class SweDataRecordParser {
 			String timeUomRef = null;
 			Integer timeDataIndex = null;
 			Integer sensorDataIndex = null;
+			List<QualityModel> qualityMod = null;
 			if(dataRecord != null &&  (sensorObservationDefiniton.equals(dataRecord.getAttributeValue(attDefinitionTag)))) {
 				int currIndex = 0;
 				for(Element fieldRecord : dataRecord.getChildren(fieldTag, swe2Ns)){
@@ -464,6 +466,7 @@ public class SweDataRecordParser {
 					//parse the time record for the sensors;
 					if((childField = fieldRecord.getChild(timeTag, swe2Ns)) != null){
 						if(samplingTimeDefinition.equals(childField.getAttributeValue(attDefinitionTag))){
+							qualityMod = parseQualityRecord(childField);
 							Element uom = childField.getChild(uomTag, swe2Ns);
 							if(uom != null)
 								timeUomRef = uom.getAttributeValue(hrefTag, xlinkNs);
@@ -490,7 +493,11 @@ public class SweDataRecordParser {
 						timeProp.setSensorType(samplingTimeDefinition);
 						timeProp.setPropertyType(PropertyType.TIME);
 						timeProp.setSensorUnitOfMeasure(timeUomRef);
-						dataRec.addSensorPropertyAtIndex(timeProp, timeDataIndex);
+					
+						List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
+						propertyList.add(timeProp);
+						propertyList = this.addQualityModelsToPropertyList(propertyList, qualityMod, timeProp);
+						dataRec.addSensorPropertyAtIndex(propertyList, timeDataIndex);
 					}
 				
 			}
@@ -588,22 +595,36 @@ public class SweDataRecordParser {
 							sensorRec.addSensorDataRecord(sensorData, 0);
 						}
 						else {
+							
+							
+//							System.out.println("start debug " + sensorModel.getSensorId());
+//							for(SensorProperty pro:sensorModel.getSensorDataRecord().getModeledProperties())
+//							System.out.println("pro "+ pro.getPropertyType());
+//							System.out.println("end debug");
 								int objectIndex = 0;
 								Integer countIndex = sensorRec.getPropertyIndex(PropertyType.COUNT);
-								if(countIndex <= sensorStartColumn )
-									countIndex++;
-								if(countIndex != null){
-									int numberRowRecords;
-									int countVal = Integer.valueOf(rowColumnVals[countIndex]);
-									int timeIndex = sensorRec.getPropertyIndex(PropertyType.TIME);
-									boolean timeGlobalField = true; 
 								
+								if(countIndex != null){
+									if(countIndex <= sensorStartColumn )
+										countIndex++;
+									int numberRowRecords;
+									Integer countVal = Integer.valueOf(rowColumnVals[countIndex]);
+									Integer timeIndex = sensorRec.getPropertyIndex(PropertyType.TIME);
+									Integer firstBinIndex = sensorRec.getPropertyIndex(PropertyType.INDEX);
+									List<Integer> allQualityIndices = sensorRec.getAllIndicesOfProperty(PropertyType.QUALITY);
 									numberRowRecords =  (sensorRec.getNumberProperties() - 2);
 
-									// check to see if time index repeats
-									if(timeIndex > countIndex ){								
-										timeGlobalField = false;
+									//Determine what qualities need to be applied to all bins
+									List<Integer> globalIndices = new ArrayList<Integer>();
+									if(firstBinIndex != null){
+										for(Integer qualIndex : allQualityIndices){
+											if(qualIndex < firstBinIndex)
+												globalIndices.add(qualIndex);
+												
+										}
 									}
+									globalIndices.add(timeIndex);
+									Collections.sort(globalIndices);
 									// first compute the
 									Object[] sensorData = null;
 									Integer currentBinIndex = null;
@@ -615,15 +636,19 @@ public class SweDataRecordParser {
 								
 										PropertyType currProperty = sensorRec.getModeledProperties().get(objectIndex).getPropertyType(); 
 										if(currProperty == PropertyType.INDEX){
+										
 											if(sensorData != null && currentBinIndex != null) 
 												sensorRec.addSensorDataRecord(sensorData, currentBinIndex);
 											sensorData = new Object[numberRowRecords];
 											currentBinIndex = Integer.valueOf(rowColumnVals[i]);
-											dataRecordIndex = -1;
-											if(timeGlobalField) {
-												sensorData[0] = rowColumnVals[timeIndex];
-												dataRecordIndex++;
+											dataRecordIndex = 0;
+												
+											for(Integer fieldIndex : globalIndices){
+												
+													sensorData[dataRecordIndex] = rowColumnVals[fieldIndex];
+													dataRecordIndex++;
 											}
+									
 										}
 										else {
 											// check for errors in the data and break if the 
@@ -642,11 +667,12 @@ public class SweDataRecordParser {
 											}
 											else if(sensorData != null)
 												sensorData[dataRecordIndex] = rowColumnVals[i];
+											dataRecordIndex++;
+
 										}
 										objectIndex ++;
 										if(objectIndex >= sensorRec.getModeledProperties().size())
-											objectIndex = countVal;
-										dataRecordIndex++;
+											objectIndex = countIndex;
 										
 									}
 									if(sensorData != null && currentBinIndex != null)
@@ -677,6 +703,23 @@ public class SweDataRecordParser {
 
 	}
 
+	// create a new record for each quality
+	private List<SensorProperty> addQualityModelsToPropertyList(List<SensorProperty> propertyList,
+																List<QualityModel> qualityMod,
+																SensorProperty parentSensorData){
+		// create a new record for each quality
+		if(qualityMod != null){
+			for(QualityModel quality : qualityMod){
+				SensorProperty sensorDataForQual = parentSensorData.getCopy();
+				sensorDataForQual.setQualityMeasure(quality);
+				sensorDataForQual.setPropertyType(PropertyType.QUALITY);
+				propertyList.add(sensorDataForQual);
+			}
+		}
+		
+		return propertyList;
+	}
+	
 	private List<SensorProperty> parseQuantityField(Element quantityElem){
 		List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
 		List<QualityModel> qualityMod = null;
@@ -704,14 +747,8 @@ public class SweDataRecordParser {
 				propertyList.add(sensorData);
 
 				// create a new record for each quality
-				if(qualityMod != null){
-					for(QualityModel quality : qualityMod){
-						SensorProperty sensorDataForQual = sensorData.getCopy();
-						sensorDataForQual.setQualityMeasure(quality);
-						sensorDataForQual.setPropertyType(PropertyType.QUALITY);
-						propertyList.add(sensorDataForQual);
-					}
-				}
+				propertyList = addQualityModelsToPropertyList(propertyList, qualityMod, sensorData);
+				
 			
 			
 		}
@@ -722,16 +759,32 @@ public class SweDataRecordParser {
 	private List<SensorProperty> processDataArrayRecord(Element dataArray){
 		List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
 		if(dataArray != null){
-			
+
 			for(Element childField : dataArray.getChildren()){
-				if(childField.getName().equals(elementCountTag) && childField.getValue().trim().equals("")){
-					
-					SensorProperty sensorData = new SensorProperty();
-					// TODO save off the allowed interval
-					sensorData.setPropertyType(PropertyType.COUNT);
-					propertyList.add(sensorData);
+				if(childField.getName().equals(elementCountTag)){
+					List<QualityModel> qualityMod = null;
+			
+					qualityMod = parseQualityRecord(childField.getChild(countTag, swe2Ns));
+				
+					if(childField.getValue().trim().equals("") || qualityMod != null) {
+						SensorProperty sensorData = new SensorProperty();
+						// TODO save off the allowed interval
+						sensorData.setPropertyType(PropertyType.COUNT);
+						propertyList.add(sensorData);
+
+
+						if(qualityMod != null){
+
+							sensorData = new SensorProperty();
+							sensorData.setSensorType(childField.getAttributeValue(this.attDefinitionTag));
+							sensorData.setPropertyType(PropertyType.QUALITY);
+							propertyList = this.addQualityModelsToPropertyList(propertyList, qualityMod,sensorData);
+						}
+					}
 
 				}
+
+
 				else if(childField.getName().equals(elementTypeTag)){
 					Element dataRec = childField.getChild(dataRecordTag, swe2Ns);
 					propertyList.addAll(getColumnsFromDataRecordElem(dataRec));
@@ -742,6 +795,8 @@ public class SweDataRecordParser {
 			
 			
 		}
+		
+
 		return propertyList;
 	}
 	
@@ -765,6 +820,10 @@ public class SweDataRecordParser {
 						// TODO save off the allowed interval
 						sensorData.setPropertyType(PropertyType.INDEX);
 						sensorProperty.add(sensorData);
+						qualityMod = parseQualityRecord(childField);
+						
+						sensorProperty = this.addQualityModelsToPropertyList(sensorProperty, qualityMod,sensorData);
+
 
 					}
 				
@@ -775,7 +834,7 @@ public class SweDataRecordParser {
 				
 			}
 		}
-		
+
 	
 		return sensorProperty;
 	}
@@ -855,6 +914,7 @@ public class SweDataRecordParser {
 			}
 
 		}
+
 		return qualityMod;
 		
 	}

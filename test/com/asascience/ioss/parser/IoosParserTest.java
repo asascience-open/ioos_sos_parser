@@ -20,6 +20,7 @@ public class IoosParserTest {
 		 String sweMultiRecordFile;
 		 String sweMultiQcRecordFile;
 		 String sweSingleStationProfile;
+		 String sweSingleProfileQc;
 		try {
 			gopFile = new java.io.File( "./TestFiles/OM-GetObservation.xml" ).getCanonicalPath();
 			sweRecordFile  = new java.io.File( 
@@ -30,6 +31,8 @@ public class IoosParserTest {
 					"./TestFiles/SWE-MultiStation-TimeSeries_QC.xml" ).getCanonicalPath();
 			sweSingleStationProfile = new java.io.File( 
 					"./TestFiles/SWE-SingleStation-TimeSeriesProfile.xml" ).getCanonicalPath();
+			sweSingleProfileQc = new java.io.File( 
+					"./TestFiles/SWE-SingleStation-TimeSeriesProfile_QC.xml" ).getCanonicalPath();
 			 System.out.println("xmlFile: " +gopFile);
 			 try {
 				 GetObservation getObsModel = gop.parseGO(gopFile);
@@ -41,7 +44,9 @@ public class IoosParserTest {
 					 }
 					 else {
 					 SweDataRecordParser sweParser = new SweDataRecordParser("timeSeriesProfile");
-					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
+					//sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
+					 sweParser.parseSweDataRecord(sweSingleProfileQc, memObs.get(0));
+
 					 }
 				 }
 				 System.out.println("Results: ");

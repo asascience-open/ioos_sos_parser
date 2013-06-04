@@ -65,8 +65,8 @@ public class SensorModel {
 		this.sensorHeight = sensorHeight;
 	}
 	
-	public String sensorDataRecordToString(SensorDataRecords sensorDataRecord){
-		String strRep  ="";
+	public String sensorDataRecordToString(SensorDataRecords sensorDataRecord, String typeStr){
+		String strRep  = typeStr +"\n";
 		if(sensorDataRecord != null){
 			List<SensorProperty> sensorData = sensorDataRecord.getModeledProperties();
 
@@ -92,11 +92,10 @@ public class SensorModel {
 
 				}
 			}
-			strRep += sensorDataRecord.toString();
 			
 		}
-		strRep += "Bin Def\n"+sensorDataRecordToString(binDefRecord);
-		strRep += sensorDataRecordToString(sensorDataRecord);
+		strRep += sensorDataRecordToString(binDefRecord,"      Bin Definition");
+		strRep += sensorDataRecordToString(sensorDataRecord,"      Sensor Recorded Properties");
 	
 		return strRep;
 	}

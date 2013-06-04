@@ -23,6 +23,21 @@ public class SensorDataRecords {
 		this.modeledProperties = modeledProperties;
 	}
 	
+	public List<Integer> getAllIndicesOfProperty(PropertyType propertyToFind){
+		List<Integer> propertyIndices = new ArrayList<Integer>();
+		int currIndex = 0;
+		for(SensorProperty prop : modeledProperties){
+			if(prop.getPropertyType() == propertyToFind){
+				propertyIndices.add(currIndex);
+			}
+			currIndex++;
+				
+		}
+		
+		
+		return propertyIndices;
+		
+	}
 	public Integer getPropertyIndex(PropertyType propertyToFind){
 		Integer countIndex = null;
 		int currIndex = 0;
@@ -37,8 +52,8 @@ public class SensorDataRecords {
 		return countIndex;
 	}
 	
-	public void addSensorPropertyAtIndex(SensorProperty sensorProp, int index){
-		modeledProperties.add(index, sensorProp);
+	public void addSensorPropertyAtIndex(List<SensorProperty> sensorProp, int index){
+		modeledProperties.addAll(index, sensorProp);
 	}
 	
 	public void addSensorDataRecord(Object[] sensorData, Integer bin){
@@ -67,12 +82,12 @@ public class SensorDataRecords {
 	}
 	
 	public String toString(){
-		String strRep = "Data records: " + "\n";
+		String strRep = "     Data records: " + "\n";
 		for(Integer bin : sensorDataList.keySet()){
-			strRep += "  bin " + bin+"\n";
+			strRep += "      bin " + bin+" \n";
 			for(Object[] sensorRow :  sensorDataList.get(bin)){
 				for(Object entry : sensorRow)
-					strRep += entry +" ";
+					strRep += "      "+ entry +" ";
 				strRep += "\n";
 			}
 		}
