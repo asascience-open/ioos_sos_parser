@@ -9,47 +9,19 @@ public class SweDataRecord {
 	// Maps the short stationID to the URN station ID
 	Map<String, String> stationIdMap;
 	
-	// Maps the short stationID to the loccation
-	Map<String, VectorModel> stationPlatformLocationMap;
-	
-	// Maps the station to a quality list
-	Map<String, List<QualityModel>> stationQualityMap;
-	
-    //Map the sensors to the sensor model record
-	Map<String, SensorModel> sensorIdtoSensorDataMap;
-	
-	
-	//Map sensor short id to full id
-	Map<String, String> sensorIdMap;
+	Map<String, StationModel> stationModelMap;
+
 	
 	Integer numberDataRows;
 	Integer timeColumn;
 	Integer sectorStartColumn;
 	public SweDataRecord(){
 		stationIdMap = new HashMap<String,String>();
-		stationPlatformLocationMap = new HashMap<String, VectorModel>();
-		sensorIdtoSensorDataMap = new HashMap<String, SensorModel>();
-		stationQualityMap = new HashMap<String, List<QualityModel>>();
-		sensorIdMap = new HashMap<String, String>();
-
+		stationModelMap = new HashMap<String, StationModel>();
 		numberDataRows = 0;
 	}
 	
 	
-	
-	public void addQualityMapEntry(String stationKey, List<QualityModel> qualityModel ){
-		stationQualityMap.put(stationKey, qualityModel);
-	}
-	
-	public Map<String, List<QualityModel>> getStationQualityMap() {
-		return stationQualityMap;
-	}
-
-
-	public void setStationQualityMap(
-			Map<String, List<QualityModel>> stationQualityMap) {
-		this.stationQualityMap = stationQualityMap;
-	}
 
 
 	
@@ -65,18 +37,7 @@ public class SweDataRecord {
 	
 
 
-	public void addPlatformLocationData(String stationShortKey, VectorModel stationLocation){
-		stationPlatformLocationMap.put(stationShortKey, stationLocation);
-	}
-	
-	public Map<String, VectorModel> getStationPlatformLocationMap() {
-		return stationPlatformLocationMap;
-	}
 
-	public void setStationPlatformLocationMap(
-			Map<String, VectorModel> stationPlatformLocationMap) {
-		this.stationPlatformLocationMap = stationPlatformLocationMap;
-	}
 
 	public void addStationIdMap(String shortIDKey, String stationIdKey){
 		System.out.println("adding "+shortIDKey + " " +stationIdKey);
@@ -94,30 +55,43 @@ public class SweDataRecord {
 	
 	public String toString(){
 		String strRep = "";
-		for(String stationId : stationIdMap.keySet()){
-			VectorModel vecMod = stationPlatformLocationMap.get(stationId);
-			strRep += "sweStation: " + stationId + " sensors=" +
-					vecMod.toString() + "\n";
-					for(SensorModel sensor : sensorIdtoSensorDataMap.values() ){
-						strRep += "   sensor " + sensor.toString() + "\n";
-						
-						}
-					}
+		for(StationModel station : stationModelMap.values()){
+			strRep += station.toString() + "\n";
+		}		
 		
 		
 		return strRep;
 	}
 
-	public void addSensorIdMap(String fullKey, String shortKey){
-		sensorIdMap.put(fullKey, shortKey);
-	}
-	public Map<String, String> getSensorIdMap() {
-		return sensorIdMap;
+	public Map<String, StationModel> getStationModelMap() {
+		return stationModelMap;
 	}
 
-	public void setSensorIdMap(Map<String, String> sensorIdMap) {
-		this.sensorIdMap = sensorIdMap;
+
+
+	public void setStationModelMap(Map<String, StationModel> stationModelMap) {
+		this.stationModelMap = stationModelMap;
 	}
+
+
+	public StationModel findStationWithSensor(String sensorId){
+		StationModel retStation = null;
+		boolean found = false;
+		for(StationModel station : getStationModelMap().values()){
+			for( SensorModel sensModel  : station.getSensorIdtoSensorDataMap().values()){
+				if(sensModel.getSensorId().equals(sensorId)){
+					retStation = station;
+					found = true;
+					break;
+				}
+			}
+			if(found)
+				break;
+		}
+		return retStation;
+	}
+	
+	
 
 	public Integer getTimeColumn() {
 		return timeColumn;
@@ -140,26 +114,5 @@ public class SweDataRecord {
 
 
 
-	public Map<String, SensorModel> getSensorIdtoSensorDataMap() {
-		return sensorIdtoSensorDataMap;
-	}
-
-
-
-	public void setSensorIdtoSensorDataMap(
-			Map<String, SensorModel> sensorIdtoSensorDataMap) {
-		this.sensorIdtoSensorDataMap = sensorIdtoSensorDataMap;
-	}
-
-	public void addSensorIdtoSensorDataMapEntry(String sensornId, List<SensorModel> sensorList){
-
-		for(SensorModel sens : sensorList){
-			String longSensName = sens.getSensorId();
-			if(longSensName != null) {
-				String shortName = sensorIdMap.get(longSensName);
-				if(shortName != null)
-					sensorIdtoSensorDataMap.put(shortName, sens);
-			}
-		}
-	}
+	
 }

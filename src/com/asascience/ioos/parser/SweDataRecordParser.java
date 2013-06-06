@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import com.asascience.ioos.model.SensorDataRecords;
 import com.asascience.ioos.model.SensorProperty;
 import com.asascience.ioos.model.SensorModel;
 import com.asascience.ioos.model.SensorProperty.PropertyType;
+import com.asascience.ioos.model.StationModel;
 import com.asascience.ioos.model.SweDataRecord;
 import com.asascience.ioos.model.VectorModel;
 
@@ -176,15 +178,15 @@ public class SweDataRecordParser {
 	
 	// parse the station record
 	private void parseStationRecord(Element stationDataRecord, SweDataRecord sweRecord ){
-		
+
 		if(stationDataRecord != null){
 			String dataRecordId = null;
 			if(stationShortIdDefinition.equals(stationDataRecord.getAttributeValue(attDefinitionTag)))
 				dataRecordId = stationDataRecord.getAttributeValue(idTag);
 			String elemDef;
 			VectorModel stationPlatformLocation = null;
-			
-			List<SensorModel> sensorModelList = null;
+			StationModel station = new StationModel();
+			station.setStationName(dataRecordId);
 			for(Element stationField : stationDataRecord.getChildren(fieldTag, swe2Ns)) {
 
 				for(Element childPropertyField : stationField.getChildren()) {
@@ -198,32 +200,34 @@ public class SweDataRecordParser {
 							sweRecord.addStationIdMap(dataRecordId, stationFullId);
 							List<QualityModel> qualityList = parseQualityRecord(stationTextElem);
 							if(qualityList != null)
-								sweRecord.addQualityMapEntry(stationFullId, qualityList);
+								station.getStationQuality().addAll(qualityList);
 						}
 					}
 					else if(elemDef.equals(platformLocationDef)){
 						stationPlatformLocation = parseVectorLocationRecord(childPropertyField);
+						station.setPlatformLocation(stationPlatformLocation);
 					}
 					else if(elemDef.equals(this.sensorListDefintion)){
-						sensorModelList = parseStaticSensorRecord(childPropertyField, sweRecord);
+						station.getSensorIdtoSensorDataMap().putAll(
+								 parseStaticSensorRecord(childPropertyField, sweRecord));
 					}
-				
+
 				}
 			}
-			sweRecord.addPlatformLocationData(dataRecordId, stationPlatformLocation);
-			sweRecord.addSensorIdtoSensorDataMapEntry(dataRecordId, sensorModelList);
+			sweRecord.getStationModelMap().put(dataRecordId, station);
 		}
 	}
 	
+	
 	// parses the sensor block in the static data
-	private List<SensorModel> parseStaticSensorRecord(Element sensorDef, SweDataRecord sweRecord){
-		List<SensorModel> sensorList = new ArrayList<SensorModel>();
+	private Map<String, SensorModel> parseStaticSensorRecord(Element sensorDef, SweDataRecord sweRecord){
+		Map<String, SensorModel> sensorList = new HashMap<String, SensorModel>();
 		for(Element sensorField : sensorDef.getChildren()){
 			for(Element sensorRecord : sensorField.getChildren()){
 				String sensorDefStr = sensorRecord.getAttributeValue(attDefinitionTag);
 				if(sensorDefinition.equals(sensorDefStr)){
 					SensorModel sensorModel = new SensorModel();
-
+					String sensorID = null;
 					for(Element sensorFields : sensorRecord.getChildren()){
 						for(Element sensorFieldType : sensorFields.getChildren()){
 							String sensorFieldDefStr = sensorFieldType.getAttributeValue(attDefinitionTag);
@@ -265,15 +269,16 @@ public class SweDataRecordParser {
 							}
 							// parse the sensor ID field
 							else if(this.sensorIdDefintion.equals(sensorFieldDefStr)){
-								String sensorID = sensorFieldType.getChildText(valueTag, swe2Ns);
-								sensorModel.setSensorId(sensorID);
+								sensorID = sensorFieldType.getChildText(valueTag, swe2Ns);
+								sensorModel.setLongSensorId(sensorID);
 								if(qualModel != null)
 									sensorModel.setSensorQualityModel(qualModel);
-								sweRecord.addSensorIdMap(sensorID, sensorRecord.getAttributeValue(idTag));
+								sensorModel.setSensorId(sensorRecord.getAttributeValue(idTag));
 							}
 						}
 					}
-					sensorList.add(sensorModel);
+					if(sensorModel.getSensorId() != null)
+						sensorList.put(sensorModel.getSensorId(), sensorModel);
 
 				}
 				
@@ -411,7 +416,8 @@ public class SweDataRecordParser {
 				// add the quality records to the modeled properties
 				if(elemQualRecords != null){
 					for(QualityModel quality : elemQualRecords){
-						for( SensorModel sensModel  : sweRecord.getSensorIdtoSensorDataMap().values()){
+						for(StationModel station : sweRecord.getStationModelMap().values()){
+						for( SensorModel sensModel  : station.getSensorIdtoSensorDataMap().values()){
 								SensorDataRecords sensorRec = sensModel.getSensorDataRecord();
 								if(sensorRec != null){
 									SensorProperty prop = new SensorProperty();
@@ -420,7 +426,7 @@ public class SweDataRecordParser {
 									prop.setQualityMeasure(quality);
 									sensorRec.getModeledProperties().add(0, prop);
 								}
-							
+						}
 						}
 					}
 					sweRecord.setSectorStartColumn(sweRecord.getSectorStartColumn() + elemQualRecords.size());
@@ -434,23 +440,26 @@ public class SweDataRecordParser {
 				Element valueElement = dataArrayElem.getChild(dynamicValuesTag, swe2Ns);
 				parseDynamicSensorDataValues(valueElement, sweRecord, decimalSeparator,
 											 tokenSeparator, blockSeparator, this.sweFileType);
-				
+
 				// Remove count & index properties from the list as they
 				// are not included in the result object
-					for(SensorModel sensModel: sweRecord.getSensorIdtoSensorDataMap().values()){
+				for(StationModel station : sweRecord.getStationModelMap().values()){
+					for( SensorModel sensModel  : station.getSensorIdtoSensorDataMap().values()){
 						SensorDataRecords dataRec = sensModel.getSensorDataRecord();
-					List<SensorProperty> toRemove = new ArrayList<SensorProperty>();
-					for(SensorProperty prop : dataRec.getModeledProperties())
-						if(prop.getPropertyType() == PropertyType.COUNT ||
-						   prop.getPropertyType() == PropertyType.INDEX)
-							toRemove.add(prop);
-					dataRec.getModeledProperties().removeAll(toRemove);
-				
+						if(dataRec != null){
+							List<SensorProperty> toRemove = new ArrayList<SensorProperty>();
+							for(SensorProperty prop : dataRec.getModeledProperties())
+								if(prop.getPropertyType() == PropertyType.COUNT ||
+								prop.getPropertyType() == PropertyType.INDEX)
+									toRemove.add(prop);
+							dataRec.getModeledProperties().removeAll(toRemove);
+						}
+					}
 				}		
 			}
 		}
 	}
-	
+
 	private void parseElementTypeRecord(Element observationsRecord, SweDataRecord sweRecord){
 	
 		if(observationsRecord != null){
@@ -470,9 +479,10 @@ public class SweDataRecordParser {
 							Element uom = childField.getChild(uomTag, swe2Ns);
 							if(uom != null)
 								timeUomRef = uom.getAttributeValue(hrefTag, xlinkNs);
-							
+						
 						}
 						timeDataIndex = currIndex;
+						currIndex += qualityMod.size();
 					}
 					
 					else if((childField = fieldRecord.getChild(dataChoiceTag, swe2Ns)) != null){
@@ -487,19 +497,22 @@ public class SweDataRecordParser {
 				
 			}
 			if(timeDataIndex != null){
-					for(SensorModel sensModel: sweRecord.getSensorIdtoSensorDataMap().values()){
+				for(StationModel station : sweRecord.getStationModelMap().values()){
+					for( SensorModel sensModel  : station.getSensorIdtoSensorDataMap().values()){
 						SensorDataRecords dataRec = sensModel.getSensorDataRecord();
-						SensorProperty timeProp = new SensorProperty();
-						timeProp.setSensorType(samplingTimeDefinition);
-						timeProp.setPropertyType(PropertyType.TIME);
-						timeProp.setSensorUnitOfMeasure(timeUomRef);
-					
-						List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
-						propertyList.add(timeProp);
-						propertyList = this.addQualityModelsToPropertyList(propertyList, qualityMod, timeProp);
-						dataRec.addSensorPropertyAtIndex(propertyList, timeDataIndex);
+						if(dataRec != null){
+							SensorProperty timeProp = new SensorProperty();
+							timeProp.setSensorType(samplingTimeDefinition);
+							timeProp.setPropertyType(PropertyType.TIME);
+							timeProp.setSensorUnitOfMeasure(timeUomRef);
+
+							List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
+							propertyList.add(timeProp);
+							propertyList = this.addQualityModelsToPropertyList(propertyList, qualityMod, timeProp);
+							dataRec.addSensorPropertyAtIndex(propertyList, timeDataIndex);
+						}
 					}
-				
+				}
 			}
 			sweRecord.setTimeColumn(timeDataIndex);
 			sweRecord.setSectorStartColumn(sensorDataIndex);
@@ -551,26 +564,36 @@ public class SweDataRecordParser {
 											  String tokenSep, String blockSep, SweFileType parseFileType)
 													  throws NumberFormatException{
 
-	
+	System.out.println("CALLED DYN VALUE -----------------");
 		if(valuesElem != null){
 			int timeColumn = sweRecord.getTimeColumn();
 			int sensorStartColumn = sweRecord.getSectorStartColumn();
 			String valueBlock = valuesElem.getValue();
 			String[] rowBlock = valueBlock.split(blockSep);
+			System.out.println("TEST DEBUG");
 			for(String row : rowBlock) {
-				String [] rowColumnVals = row.split(tokenSep);
+				String [] rowColumnVals = row.trim().split(tokenSep);
+				System.out.println("time column " + timeColumn + "sensor start" + sensorStartColumn 
+						+ " len" +rowColumnVals.length);
 				if(timeColumn < rowColumnVals.length && 
 						sensorStartColumn < rowColumnVals.length){
 					String sensorId = rowColumnVals[sensorStartColumn];
-					SensorModel sensorModel = sweRecord.getSensorIdtoSensorDataMap().get(sensorId);
+					System.out.println("looking for sensor " +sensorId);
+					StationModel station =  sweRecord.findStationWithSensor(sensorId);
+					if(station == null) continue;
+					System.out.println("station is not null");
+					SensorModel sensorModel = station.getSensorIdtoSensorDataMap().get(sensorId);
+			
 					if(sensorModel != null) {
 						SensorDataRecords sensorRec = sensorModel.getSensorDataRecord(); 
+						System.out.println("get sensor model ");
 						if(sensorRec != null ){
-
+							System.out.println("Not null");
 							if(parseFileType == SweFileType.TIME_SERIES) {
 								Object[] sensorData = new Object[sensorRec.getNumberProperties()];
-
-
+								System.out.println("********debug for " + sensorModel.getSensorId());
+								for(SensorProperty sP :sensorRec.getModeledProperties() )
+									System.out.println(sP.getSensorType());
 								// verify that the number of columns for this entry is 1 greater than
 								// the number of properties (the sensor id is also a column)
 								if(rowColumnVals.length == sensorData.length + 1) {
@@ -869,7 +892,9 @@ public class SweDataRecordParser {
 				sensorProperty.addAll(getColumnsFromDataRecordElem(dataRecordElem));
 			}
 			SensorDataRecords sensorDataRecord = new SensorDataRecords(sensorId, sensorProperty);
-			SensorModel sensModel = sweRecord.getSensorIdtoSensorDataMap().get(sensorId);
+			StationModel station =  sweRecord.findStationWithSensor(sensorId);
+			if(station == null) continue;
+			SensorModel sensModel = station.getSensorIdtoSensorDataMap().get(sensorId);
 			if(sensModel !=  null)
 				sensModel.setSensorDataRecord(sensorDataRecord);
 

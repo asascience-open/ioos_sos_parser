@@ -3,11 +3,8 @@ package com.asascience.ioos.model;
 
 import org.joda.time.DateTime;
 
-public class MemberObservation {
-	private String description;
-	private DateTime startSamplingTime;
-	private DateTime endSamplingTime;
-	private ObservedPropertyModel observedProperties;
+public class MemberObservation extends BaseObservationModel {
+	
 	private FeatureCollectionModel featureCollectionProperties;
 	private SweDataRecord sweDataRecords;
 	
@@ -25,24 +22,9 @@ public class MemberObservation {
 		this.featureCollectionProperties = featureCollectionProperties;
 	}
 
-	public String getDescription() {
-		return description;
-	}
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public void setStartSamplingTime(DateTime startTime){
-		startSamplingTime = startTime;
-		
-	}
 	
-	public void setEndSamplingTime(DateTime endTime){
-		endSamplingTime = endTime;
-	}
-	
-
+	@Override
 	public String toString() {
 		String memberStr =  "description: " + description + "\n";
 		if(startSamplingTime != null)
@@ -60,22 +42,6 @@ public class MemberObservation {
 	}
 
 
-
-	public ObservedPropertyModel getObservedProperties() {
-		return observedProperties;
-	}
-
-	public void setObservedProperties(ObservedPropertyModel observedProperties) {
-		this.observedProperties = observedProperties;
-	}
-
-	public DateTime getStartSamplingTime() {
-		return startSamplingTime;
-	}
-
-	public DateTime getEndSamplingTime() {
-		return endSamplingTime;
-	}
 
 	public SweDataRecord getSweDataRecords() {
 		return sweDataRecords;

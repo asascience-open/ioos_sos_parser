@@ -137,7 +137,7 @@
         <sos:time>
           <gml:TimePeriod>
             <!-- Time period allows a variety of fixed (ISO 8601) and evaluated (now) expressions -->
-            <gml:beginPosition>BEGINNING</gml:beginPosition>
+            <gml:beginPosition>2008-04-28T08:00:00.000Z</gml:beginPosition>
             <gml:endPosition indeterminatePosition="now"/>
           </gml:TimePeriod>
         </sos:time>
@@ -169,7 +169,7 @@
         <sos:time>
           <gml:TimePeriod>
             <!-- Time period allows a variety of fixed (ISO 8601) and evaluated (now) expressions -->
-            <gml:beginPosition>BEGINNING</gml:beginPosition>
+            <gml:beginPosition>2008-04-28T08:00:00.000Z</gml:beginPosition>
             <gml:endPosition indeterminatePosition="now"/>
           </gml:TimePeriod>
         </sos:time>

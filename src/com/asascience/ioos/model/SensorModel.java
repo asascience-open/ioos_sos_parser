@@ -9,7 +9,7 @@ public class SensorModel {
 	private List<QualityModel> sensorQualityModel;
 	private VectorModel sensorLocation;
 	private VectorModel sensorOrientation;
-
+	private String longSensorId;
 	//bin definition for this sensor
 	SensorDataRecords binDefRecord;
 	
@@ -81,7 +81,7 @@ public class SensorModel {
 		return strRep;
 	}
 	public String toString() {
-		String strRep = "SensorID: " + sensorId + " Height: " + sensorHeight;
+		String strRep = "SensorID: " + sensorId + " Height: " + sensorHeight +"\n";
 		
 		if(sensorDataRecord != null){
 			List<SensorProperty> sensorData = sensorDataRecord.getModeledProperties();
@@ -118,6 +118,14 @@ public class SensorModel {
 
 	public void setBinDefRecord(SensorDataRecords binDefRecord) {
 		this.binDefRecord = binDefRecord;
+	}
+
+	public String getLongSensorId() {
+		return longSensorId;
+	}
+
+	public void setLongSensorId(String longSensorId) {
+		this.longSensorId = longSensorId;
 	}
 
 	

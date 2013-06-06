@@ -27,57 +27,26 @@ import com.asascience.ioos.model.ObservedPropertyModel;
 import com.asascience.ioos.model.SweDataRecord;
 
 
-public class GetObservationParser {
-	private final String omNsTag = "om";
-	private final String gmlNsTag = "gml";
-	private final String sweNsTag = "swe";
-	private final String swe2NsTag = "swe2";
-	private final String xlinkNsTag = "xlink";
-	private final String xsiNsTag = "xsi";
+public class GetObservationParser extends BaseParser {
+
 	private final String schemaLocTag = "schemaLocation";	
 	private final String memberTag ="member";
-	private final String gmlMetaDataTag = "metaDataProperty";
-	private final String xlinkAttributeTitleTag = "title";
-	private final String xlinkAttributeHrefTag = "href";
 	private final String genericMetaDataTag = "GenericMetaData";
-	private final String gmlDescriptionTag = "description";
-	private final String gmlVersionTag = "version";
 	private final String omObservationTag = "Observation";
 	private final String omSamplingTime = "samplingTime";
-	private final String gmlTimePeriod = "TimePeriod";
-	private final String gmlBeginPosition = "beginPosition";
-	private final String gmlEndPosition = "endPosition";
 	private final String omProcedureTag = "procedure";
 	private final String omProcessTag = "Process";
 	private final String sweCompositePhenomTag ="CompositePhenomenon";
 	private final String sweComponentTag = "component";
 	private final String gmlIdTag = "id";
-	private final String gmlNameTag = "name";
 	private final String dimensionTag = "dimension";
 	private final String omObservedPropertyTag = "observedProperty";
 	private final String omFeatureTag = "featureOfInterest";
 	private final String omResultTag = "result";
 	private final String gmlFeatureCollectionTag = "FeatureCollection";
-	private final String gmlCodeSpaceTag = "codeSpace";
-	private final String gmlBoundedByTag = "boundedBy";
-	private final String gmlEnvelopeTag = "Envelope";
-	private final String gmlLowerCornerTag = "lowerCorner";
-	private final String gmlUpperCornerTag =  "upperCorner";
-	private final String gmlPosTag =  "pos";
-	private final String gmlSrsAttTag = "srsName";
-	private final String gmlLocationTag = "location";
-	private final String gmlMultiPointTag = "MultiPoint";
-	private final String gmlPointTag = "Point";
-	private final String gmlPointMembersTag = "pointMembers";
+
 	private final String swe2DataRecordTag = "DataRecord";
 
-	
-	private Namespace omNs;
-	private Namespace gmlNs;
-	private Namespace sweNs;
-	private Namespace swe2Ns;
-	private Namespace xlinkNs;
-	
 	private String xsiSchemaLocation;
 	
 	public GetObservationParser(){
@@ -85,29 +54,7 @@ public class GetObservationParser {
 	}
 	
 	
-	// initialize the getObservation namespaces
-	private void initGoNamespaces(Element root){
-		for(Namespace ns : root.getAdditionalNamespaces()){
-			switch(ns.getPrefix()){
-			case omNsTag:
-				omNs = ns;
-				break;
-			case gmlNsTag:
-				gmlNs = ns;
-				break;
-			case sweNsTag:
-				sweNs = ns;
-				break;
-			case xlinkNsTag:
-				xlinkNs = ns;
-				break;
-			case swe2NsTag:
-				swe2Ns = ns;
-				break;
-			}
-		}
-		
-	}
+
 	
 	// Parse an observation record
 	private void processObservation(Element obsElement, MemberObservation memberObs) throws MalformedURLException{
@@ -190,7 +137,7 @@ public class GetObservationParser {
 					Element envelope = childDataElem.getChild(gmlEnvelopeTag, gmlNs);
 					if(envelope != null){
 					
-						featureModel.setBoundingBoxSrsName(envelope.getAttributeValue(gmlSrsAttTag, gmlNs));
+						featureModel.setBoundingBoxSrsName(envelope.getAttributeValue(gmlSrsNameTag, gmlNs));
 						String cornerStr = envelope.getChildText(gmlLowerCornerTag, gmlNs);
 					
 						String [] latLon = cornerStr.split(" ");
