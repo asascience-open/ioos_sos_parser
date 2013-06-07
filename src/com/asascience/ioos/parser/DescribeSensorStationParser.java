@@ -71,6 +71,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 	private final String eventListTag ="EventList";
 	private final String eventTag = "Event";
 	private final String dateTag = "date";
+	private final String ioosServiceMetadata = "ioosServiceMetadata";
 	
 	public DescribeSensorStationParser(){
 		
@@ -85,8 +86,12 @@ public class DescribeSensorStationParser  extends BaseParser{
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
 			Element root = xmlDoc.getRootElement();
 			initNamespaces(root);
-			//TODO  parse the metadata
-			
+
+			for(Element capa : root.getChildren(capabilitiesTag, smlNs)){
+				String version = parseVersionMetadata(capa);
+				if(version != null)
+					describeStation.setServiceVersion(version);
+			}
 			parseMemberData(root.getChild(memberTag, smlNs), describeStation);
 			
 		}
@@ -133,6 +138,25 @@ public class DescribeSensorStationParser  extends BaseParser{
 		return idMap;
 	}
 	
+	
+	private String parseVersionMetadata(Element capaElement){
+		String version = null;
+		if(capaElement != null && capaElement.getAttributeValue(nameTag).equals(ioosServiceMetadata)){
+			Element simpleData = capaElement.getChild(simpleDataRecordTag, sweNs);
+			if(simpleData != null){
+				for(Element field : simpleData.getChildren(fieldTag, sweNs)){
+				
+						Element textE = field.getChild(textTag, sweNs);
+						if(textE != null){
+							version = textE.getChildText(valueTag, sweNs);
+						}
+					
+				}
+			}
+		}
+			return version;
+	}
+		
 	private void parseClassificationRecords(Element classElem, DescribeSensorStation dStation){
 		if(classElem == null)
 			return;
@@ -184,7 +208,6 @@ public class DescribeSensorStationParser  extends BaseParser{
 		Map<String, DescriptionObject> capaMap = null;
 		if(capaElement != null){
 			Element simpleData = capaElement.getChild(simpleDataRecordTag, sweNs);
-			System.out.println("%%%%%%"+simpleData.toString());
 			if(simpleData != null){
 				for(Element field : simpleData.getChildren(fieldTag, sweNs)){
 					Element textE = field.getChild(textTag, sweNs);
