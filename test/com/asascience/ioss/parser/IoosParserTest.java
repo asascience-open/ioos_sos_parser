@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.jdom2.JDOMException;
 
-import com.asascience.ioos.exception.GetObservationException;
+import com.asascience.ioos.exception.IoosSosParserException;
 import com.asascience.ioos.model.GetObservation;
 import com.asascience.ioos.model.MemberObservation;
 import com.asascience.ioos.model.capabilities.GetCapabilities;
+import com.asascience.ioos.model.describe.DescribeSensorStation;
+import com.asascience.ioos.parser.DescribeSensorStationParser;
 import com.asascience.ioos.parser.GetCapabilitiesParser;
 import com.asascience.ioos.parser.GetObservationParser;
 import com.asascience.ioos.parser.SweDataRecordParser;
@@ -18,6 +20,7 @@ public class IoosParserTest {
 	public static void main(String[] args){
 		GetObservationParser gop = new GetObservationParser();
 		GetCapabilitiesParser gc = new GetCapabilitiesParser();
+		DescribeSensorStationParser dss = new DescribeSensorStationParser();
 		 String gopFile;
 		 String sweRecordFile;
 		 String sweMultiRecordFile;
@@ -25,6 +28,8 @@ public class IoosParserTest {
 		 String sweSingleStationProfile;
 		 String sweSingleProfileQc;
 		 String getCapFile;
+		 String describeSensNetFile;
+		 String describeSensStatFile;
 		try {
 			gopFile = new java.io.File( "./TestFiles/OM-GetObservation.xml" ).getCanonicalPath();
 			getCapFile = new java.io.File( "./TestFiles/SOS-GetCapabilities.xml" ).getCanonicalPath();
@@ -42,6 +47,10 @@ public class IoosParserTest {
 //					"./TestFiles/SWE-SingleStation-TimeSeriesProfile_QC.xml" ).getCanonicalPath();
 			sweSingleProfileQc = new java.io.File( 
 					"./TestFiles/new-TimeSeriesProfile_QC.xml" ).getCanonicalPath();
+			describeSensNetFile = new java.io.File( 
+					"./TestFiles/SML-DescribeSensor-Network.xml").getCanonicalPath();
+			describeSensStatFile = new java.io.File( 
+					"./TestFiles/SML-DescribeSensor-Station.xml").getCanonicalPath();
 			 System.out.println("xmlFile: " +gopFile);
 			 try {
 				 GetObservation getObsModel = gop.parseGO(gopFile);
@@ -60,17 +69,27 @@ public class IoosParserTest {
 				 }
 				 
 				 System.out.println("Results: ");
-           System.out.println(getObsModel.toString());
-			
-           System.out.println("----BEGIN GET CAPABILITIES");
-			 GetCapabilities getCapsModel = gc.parseGO(getCapFile);
-			 System.out.println(getCapsModel.toString());
-	           System.out.println("----END GET CAPABILITIES");
+				 System.out.println(getObsModel.toString());
+
+				 System.out.println("----BEGIN GET CAPABILITIES");
+				 GetCapabilities getCapsModel = gc.parseGO(getCapFile);
+				 System.out.println(getCapsModel.toString());
+				 System.out.println("----END GET CAPABILITIES");
+				 
+				 System.out.println("----BEGIN DESCRIBE SENSOR NETWORK----");
+				 DescribeSensorStation sensStat = dss.parseDesribeStation(describeSensNetFile);
+				 System.out.println(sensStat.toString());
+				 System.out.println("----END DESCRIBE SENSOR NETWORK----");
+
+				 System.out.println("----BEGIN DESCRIBE SENSOR STATION----");
+				 DescribeSensorStation sensStat2 = dss.parseDesribeStation(describeSensStatFile);
+				 System.out.println(sensStat2.toString());
+				 System.out.println("----END DESCRIBE SENSOR STATION----");
 
 			} catch (JDOMException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			} catch (GetObservationException e) {
+			} catch (IoosSosParserException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

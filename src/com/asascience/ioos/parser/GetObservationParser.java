@@ -17,8 +17,8 @@ import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.joda.time.DateTime;
 
-import com.asascience.ioos.exception.GetObservationException;
-import com.asascience.ioos.exception.GetObservationException.GetObservationErrors;
+import com.asascience.ioos.exception.IoosSosParserException;
+import com.asascience.ioos.exception.IoosSosParserException.IoosSosParserErrors;
 import com.asascience.ioos.model.FeatureCollectionModel;
 import com.asascience.ioos.model.GetObservation;
 import com.asascience.ioos.model.LatLonPoint;
@@ -127,7 +127,7 @@ public class GetObservationParser extends BaseParser {
 				System.out.println("Feature coll"+featureCollectionElem.toString());
 				Element childDataElem = featureCollectionElem.getChild(gmlMetaDataTag, gmlNs);
 				if(childDataElem != null){
-					Element featureType = childDataElem.getChild(gmlNameTag, gmlNs);
+					Element featureType = childDataElem.getChild(nameTag, gmlNs);
 					featureModel.setFeatureCodeSpace(featureType.getAttributeValue(gmlCodeSpaceTag));
 					featureModel.setFeatureType(featureType.getValue());
 				}
@@ -167,7 +167,7 @@ public class GetObservationParser extends BaseParser {
 						String stationKey;
 						String posStr;
 						for(Element point : pointMembers.getChildren(gmlPointTag, gmlNs)){
-							stationKey = point.getChildText(gmlNameTag, gmlNs);
+							stationKey = point.getChildText(nameTag, gmlNs);
 							posStr = point.getChildText(gmlPosTag, gmlNs);
 							
 							if(stationKey != null && posStr != null){
@@ -196,7 +196,7 @@ public class GetObservationParser extends BaseParser {
 			
 			System.out.println(compositeElem.toString());
 			if(compositeElem != null) {
-				obPropModel.setPhonemononName(compositeElem.getChildText(gmlNameTag, gmlNs));
+				obPropModel.setPhonemononName(compositeElem.getChildText(nameTag, gmlNs));
 				obPropModel.setDimension(compositeElem.getAttributeValue(dimensionTag));
 				obPropModel.setPhonemononId(compositeElem.getAttributeValue(gmlIdTag, gmlNs));
 				for(Element childProp : compositeElem.getChildren(sweComponentTag, sweNs)){
@@ -210,7 +210,7 @@ public class GetObservationParser extends BaseParser {
 	
 	// Parse an om:member record
 	private void parseMembers(Element root, GetObservation getObservationModel) 
-			throws GetObservationException, MalformedURLException{
+			throws IoosSosParserException, MalformedURLException{
 		for(Element member : root.getChildren(memberTag, omNs)){
 			MemberObservation memberObs = new MemberObservation();
 			
@@ -220,7 +220,7 @@ public class GetObservationParser extends BaseParser {
 		}
 		
 		if(getObservationModel.getNumberMemberObservations() < 1)
-			throw new GetObservationException(GetObservationErrors.MEMBER_REQUIRED);
+			throw new IoosSosParserException(IoosSosParserErrors.MEMBER_REQUIRED);
 		
 	}
 	
@@ -249,7 +249,7 @@ public class GetObservationParser extends BaseParser {
 	
 	
 	
-	public GetObservation parseGO(String xmlFileName) throws JDOMException, IOException, GetObservationException{
+	public GetObservation parseGO(String xmlFileName) throws JDOMException, IOException, IoosSosParserException{
 		File xmlFile = new File(xmlFileName);
 		GetObservation getObservation = null;
 
@@ -258,7 +258,7 @@ public class GetObservationParser extends BaseParser {
 			getObservation = new GetObservation();
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
 			Element root = xmlDoc.getRootElement();
-			initGoNamespaces(root);
+			initNamespaces(root);
 
 			parseGmlMetaData(root, getObservation);
 			parseMembers(root, getObservation);

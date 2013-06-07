@@ -96,7 +96,7 @@
       <sml:capabilities name="observationTimeRange">
         <swe:DataRecord>
           <swe:field name="observationTimeRange">
-            <swe:TimeRange definition="DEFINE_ME_http://mmisw.org/ont/ioos/definition/observationTimeRange">
+            <swe:TimeRange definition="http://mmisw.org/ont/ioos/definition/observationTimeRange">
               <swe:value>2008-04-28T08:00:00.000Z 2012-12-27T19:00:00.000Z</swe:value>
             </swe:TimeRange>
           </swe:field>
@@ -179,6 +179,11 @@
                       <sml:value>WMO 41001 Buoy, Cape Hatteras</sml:value>
                     </sml:Term>
                   </sml:identifier>
+                    <sml:identifier name="longName">
+                    <sml:Term definition="http://mmisw.org/ont/ioos/definition/longName">
+                      <sml:value>WMO 41001 Buoy, Cape Hatteras</sml:value>
+                    </sml:Term>
+                  </sml:identifier>
                 </sml:IdentifierList>
               </sml:identification>
    
@@ -239,6 +244,11 @@
                   <sml:identifier name="shortName">
                     <sml:Term definition="http://mmisw.org/ont/ioos/definition/shortName">
                       <sml:value>WMO 41002 Buoy, Cape Hatteras</sml:value>
+                    </sml:Term>
+                  </sml:identifier>
+                    <sml:identifier name="longName">
+                    <sml:Term definition="http://mmisw.org/ont/ioos/definition/longName">
+                      <sml:value>WMO 41001 Buoy, Cape Hatteras</sml:value>
                     </sml:Term>
                   </sml:identifier>
                 </sml:IdentifierList>

@@ -109,7 +109,7 @@
       <sml:capabilities name="observationTimeRange">
         <swe:DataRecord>
           <swe:field name="observationTimeRange">
-            <swe:TimeRange definition="DEFINE_ME_http://mmisw.org/ont/ioos/definition/observationTimeRange">
+            <swe:TimeRange definition="http://mmisw.org/ont/ioos/definition/observationTimeRange">
               <swe:value>2008-04-28T08:00:00.000Z 2012-12-27T19:00:00.000Z</swe:value>
             </swe:TimeRange>
           </swe:field>

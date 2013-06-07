@@ -12,6 +12,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.joda.time.DateTime;
 
+import com.asascience.ioos.model.AddressModel;
+import com.asascience.ioos.model.BoundingBox;
 import com.asascience.ioos.model.LatLonPoint;
 import com.asascience.ioos.model.capabilities.DCP;
 import com.asascience.ioos.model.capabilities.GetCapabilities;
@@ -36,14 +38,7 @@ public class GetCapabilitiesParser extends BaseParser {
 	private final String providerSiteTag = "ProviderSite";
 	private final String serviceContactTag = "ServiceContact";
 	private final String individualNameTag = "IndividualTName";
-	private final String contactInfoTag = "ContactInfo";
 	private final String voiceTag = "Voice";
-	private final String deliveryPointTag = "DeliveryPoint";
-	private final String cityTag = "cityTag";
-	private final String administrativeAreaTag = "AdministrativeArea";
-	private final String postalCodeTag = "PostalCode";
-	private final String countryTag = "Country";
-	private final String emailTag = "ElectronicMailAddress";
 	private final String operationsMetadataTag = "OperationsMetadata";
 	private final String operationTag = "Operation";
 	private final String dcpTag = "DCP";
@@ -51,7 +46,6 @@ public class GetCapabilitiesParser extends BaseParser {
 	private final String postTag ="Post";
 	private final String paramaterTag = "Parameter";
 	private final String allowedValuesTag = "AllowedValues";
-	private final String nameTag = "name";
 	private final String extendedCapaTag = "ExtendedCapabilities";
 	private final String contentsTag = "Contents";
 	private final String observationOfferingListTag = "ObservationOfferingList";
@@ -85,36 +79,10 @@ public class GetCapabilitiesParser extends BaseParser {
 						if(contactElem.getName().equals(individualNameTag)){
 							provider.setContactName(contactElem.getText());
 						}
-						else if(contactElem.getName().equals(contactInfoTag)){
-							for(Element childElem : contactElem.getChildren()){
-								for(Element dataElem : childElem.getChildren()){
-									String dataText = dataElem.getText();
-
-									switch(dataElem.getName()){
-									case voiceTag:
-										provider.setContactPhone(dataText);
-										break;
-									case deliveryPointTag:
-										provider.setAddressDeliveryPoint(dataText);
-										break;
-									case cityTag:
-										provider.setAddressCity(dataText);
-										break;
-									case administrativeAreaTag:
-										provider.setAddressAdminArea(dataText);
-										break;
-									case postalCodeTag:
-										provider.setAddressZipCode(dataText);
-										break;
-									case countryTag:
-										provider.setAddressCountry(dataText);
-										break;
-									case emailTag:
-										provider.setContactEmail(dataText);
-										break;
-									}
-								}
-							}
+						else if(contactElem.getName().equals(owsContactInfoTag)){
+							parseContactInfo(contactElem, provider);
+						
+							
 						}
 					}
 				}
@@ -255,7 +223,7 @@ public class GetCapabilitiesParser extends BaseParser {
 		if(observation != null){
 			obs = new Observation();
 			obs.setDescription(observation.getChildText(gmlDescriptionTag, gmlNs));
-			obs.setObservationName(observation.getChildText(gmlNameTag, gmlNs));
+			obs.setObservationName(observation.getChildText(nameTag, gmlNs));
 			obs.setObservationSrsName(observation.getChildText(gmlSrsNameTag, gmlNs));
 			obs.setResponseFormat(observation.getChildText(responseFormatTag, sosNs));
 			obs.setResultModel(observation.getChildText(resultModelTag, sosNs));
@@ -273,15 +241,9 @@ public class GetCapabilitiesParser extends BaseParser {
 				obs.getObservedPropertiesRefList().add(
 						obsProp.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
 			}
-			childElem = observation.getChild(gmlBoundedByTag, gmlNs);
-			if(childElem != null){
-				Element envelopeE = childElem.getChild(gmlEnvelopeTag, gmlNs);
-				if(envelopeE != null){
-					obs.setLowerLeftCornerBB(parseCorner(envelopeE.getChild(gmlLowerCornerTag, gmlNs)));
-					obs.setUpperRightCornerBB(parseCorner(envelopeE.getChild(gmlUpperCornerTag, gmlNs)));
+		
+			obs.setBoundingBox(parseBoundedBy(observation.getChild(gmlBoundedByTag, gmlNs)));
 
-				}
-			}
 			childElem = observation.getChild(timeTag, sosNs);
 			if(childElem != null){
 				// Get the start and end time periods
@@ -321,20 +283,6 @@ public class GetCapabilitiesParser extends BaseParser {
 		}
 		return obs;
 	}
-	
-	
-	private LatLonPoint parseCorner(Element corner){
-		LatLonPoint cornerPt = null;
-		if(corner != null){
-			String cornerStr = corner.getText();
-			String [] latLon = cornerStr.split(" ");
-			if(latLon.length == 2)
-				cornerPt = new LatLonPoint(Double.valueOf(latLon[0]),
-														Double.valueOf(latLon[1]));
-		}
-		return cornerPt;
-	}
-	
 
 	
 	public GetCapabilities parseGO(String xmlFileName) throws JDOMException, IOException{
@@ -345,7 +293,7 @@ public class GetCapabilitiesParser extends BaseParser {
 			getCap = new GetCapabilities();
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
 			Element root = xmlDoc.getRootElement();
-			initGoNamespaces(root);
+			initNamespaces(root);
 			getCap.setServiceId( parseServiceIdentification(root.getChild(serviceIdTag, owsNs)));
 			getCap.setServiceProvider(parseServiceProvider(root.getChild(serviceProviderTag, owsNs)));
 			parseOperationsMetadata(root.getChild(operationsMetadataTag, owsNs), getCap);

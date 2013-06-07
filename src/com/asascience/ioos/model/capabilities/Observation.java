@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.asascience.ioos.model.BaseObservationModel;
+import com.asascience.ioos.model.BoundingBox;
 import com.asascience.ioos.model.LatLonPoint;
 
 public class Observation extends BaseObservationModel{
@@ -13,8 +14,7 @@ public class Observation extends BaseObservationModel{
 	String responseFormat;
 	String resultModel;
 	String responseMode;
-	private LatLonPoint lowerLeftCornerBB;
-	private LatLonPoint upperRightCornerBB;
+	BoundingBox boundingBox;
 	public Observation(){
 		observedPropertiesRefList = new ArrayList<String>();
 	}
@@ -26,8 +26,7 @@ public class Observation extends BaseObservationModel{
 		strRep += "response format: " + responseFormat + "\n";
 		strRep += "result model: " + resultModel  + "\n";
 		strRep += "response mode: " + responseMode  + "\n";
-		strRep += "Lower Corner: " + lowerLeftCornerBB.toString() + "\n";
-		strRep += "Upper Corner: " + upperRightCornerBB.toString() + "\n";
+		strRep += boundingBox.toString();
 		return strRep;
 	}
 	public String getProcedureLink() {
@@ -66,16 +65,13 @@ public class Observation extends BaseObservationModel{
 	public void setResponseMode(String responseMode) {
 		this.responseMode = responseMode;
 	}
-	public LatLonPoint getLowerLeftCornerBB() {
-		return lowerLeftCornerBB;
+
+
+	public BoundingBox getBoundingBox() {
+		return boundingBox;
 	}
-	public void setLowerLeftCornerBB(LatLonPoint lowerLeftCornerBB) {
-		this.lowerLeftCornerBB = lowerLeftCornerBB;
-	}
-	public LatLonPoint getUpperRightCornerBB() {
-		return upperRightCornerBB;
-	}
-	public void setUpperRightCornerBB(LatLonPoint upperRightCornerBB) {
-		this.upperRightCornerBB = upperRightCornerBB;
+
+	public void setBoundingBox(BoundingBox boundingBox) {
+		this.boundingBox = boundingBox;
 	}
 }

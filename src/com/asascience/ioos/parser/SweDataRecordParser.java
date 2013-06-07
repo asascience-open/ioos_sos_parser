@@ -11,7 +11,6 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 
 import com.asascience.ioos.model.Coordinate;
@@ -26,7 +25,7 @@ import com.asascience.ioos.model.SweDataRecord;
 import com.asascience.ioos.model.VectorModel;
 
 
-public class SweDataRecordParser {
+public class SweDataRecordParser extends BaseParser {
 	public enum SweFileType{
 		TIME_SERIES("timeSeries"),
 		TIME_SERIES_PROFILE("timeSeriesProfile");
@@ -36,31 +35,21 @@ public class SweDataRecordParser {
 		}
 	}
 	private SweFileType sweFileType;
-	private Namespace swe2Ns;
-	private Namespace xsiNs;
-	private Namespace xlinkNs;
+
 	private String decimalSeparator = ".";
 	private String tokenSeparator = ",";
 	private String blockSeparator = "\n";
-	private final String hrefTag = "href";
 	private final String swe2NsTag = "swe2";
 	private final String idTag = "id";
 	private final String xlinkNsTag = "xlink";
 	private final String xsiNsTag = "xsi";
-	private final String fieldTag = "field";
 	private final String textTag = "Text";
-	private final String attNameTag = "name";
 	private final String axisIdTag = "axisID";
 	private final String itemTag = "item";
-	private final String uomTag = "uom";
 	private final String labelTag = "label";
-	private final String valueTag = "value";
 	private final String dynamicValuesTag = "values";
 	private final String nilValuesTag = "nilValues";
 	private final String nilValueTag = "nilValue";
-	private final String codeTag = "code";
-	private final String codeSpaceTag = "codeSpace";
-	private final String attDefinitionTag = "definition";
 	private final String referenceFrameTag = "referenceFrame";
 	private final String dataRecordTag = "DataRecord";
 	private final String dataArrayTag = "DataArray";
@@ -74,12 +63,10 @@ public class SweDataRecordParser {
 	private final String blockSeparatorAtt = "blockSeparator";
 	private final String countTag = "Count";
 	private final String qualityTag = "quality";
-	private final String quantityTag = "Quantity";
 	private final String quantityRangeTag = "QuantityRange";
 
 	private final String constraintTag =  "constraint";
 	private final String allowedTokenTag = "AllowedTokens";
-	private final String descriptionTag = "description";
 	private final String timeTag = "Time";
 	private final String stationsStaticDataDef = "http://mmisw.org/ont/ioos/definition/stations";
 	private final String stationShortIdDefinition = "http://mmisw.org/ont/ioos/definition/station";
@@ -120,21 +107,7 @@ public class SweDataRecordParser {
 	}
 	
 	
-	private void initSweNamespaces(Element root){
-		for(Namespace ns : root.getAdditionalNamespaces()){
-			switch(ns.getPrefix()){
-			case swe2NsTag:
-				swe2Ns = ns;
-				break;
-			case xsiNsTag:
-				xsiNs = ns;
-				break;
-			case xlinkNsTag:
-				xlinkNs = ns;
-				break;
-			}
-		}	
-	}
+	
 	
 
 	
@@ -143,7 +116,7 @@ public class SweDataRecordParser {
 	public void parseSweDataRecord(Element sweDataRecord, MemberObservation memberObs){
 		if(sweDataRecord == null) return;
 		SweDataRecord sweRecord = new SweDataRecord();
-		initSweNamespaces(sweDataRecord);
+		initNamespaces(sweDataRecord);
 		List<Element> fieldNameElem = sweDataRecord.getChildren(fieldTag, swe2Ns);
 		boolean isStatic;
 		for(Element elem : fieldNameElem){
@@ -264,7 +237,7 @@ public class SweDataRecordParser {
 							else if(profileBinsDefinition.equals(sensorFieldDefStr) ||
 									profileHeightDefinition.equals(sensorFieldDefStr)){
 								parseProfileBins(sensorFieldType,  
-										sensorFieldType.getAttributeValue(attNameTag), 
+										sensorFieldType.getAttributeValue(nameTag), 
 										sensorModel);
 							}
 							// parse the sensor ID field
@@ -324,7 +297,7 @@ public class SweDataRecordParser {
 					coordDef = coordType.getAttributeValue(attDefinitionTag);
 					Coordinate tempCoord = new Coordinate();
 					tempCoord.setAxisId(coordType.getAttributeValue(axisIdTag));
-					tempCoord.setCoordinateName(coord.getAttributeValue(attNameTag));
+					tempCoord.setCoordinateName(coord.getAttributeValue(nameTag));
 					Element childElem = coordType.getChild(uomTag, swe2Ns);
 					if(childElem != null)
 						tempCoord.setUnitOfMeasure(childElem.getAttributeValue(codeTag));
@@ -478,7 +451,7 @@ public class SweDataRecordParser {
 							qualityMod = parseQualityRecord(childField);
 							Element uom = childField.getChild(uomTag, swe2Ns);
 							if(uom != null)
-								timeUomRef = uom.getAttributeValue(hrefTag, xlinkNs);
+								timeUomRef = uom.getAttributeValue(xlinkAttributeHrefTag, xlinkNs);
 						
 						}
 						timeDataIndex = currIndex;
@@ -885,7 +858,7 @@ public class SweDataRecordParser {
 	private void processDynamicSensorData(Element dataChoiceElem, SweDataRecord sweRecord){
 	
 		for(Element sensorItem : dataChoiceElem.getChildren(itemTag, swe2Ns)){
-			String sensorId = sensorItem.getAttributeValue(attNameTag, swe2Ns);
+			String sensorId = sensorItem.getAttributeValue(nameTag, swe2Ns);
 	
 			List<SensorProperty> sensorProperty = new ArrayList<SensorProperty>();
 			for(Element dataRecordElem : sensorItem.getChildren()){
@@ -918,7 +891,7 @@ public class SweDataRecordParser {
 						}
 						childElem = catElem.getChild(codeSpaceTag, swe2Ns);
 						if(childElem !=  null){
-							model.setReferenceLink(childElem.getAttributeValue(hrefTag, xlinkNs));
+							model.setReferenceLink(childElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
 						}
 						childElem = catElem.getChild(constraintTag, swe2Ns);
 						if(childElem != null){
