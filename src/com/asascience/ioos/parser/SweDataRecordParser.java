@@ -875,11 +875,10 @@ public class SweDataRecordParser extends BaseParser {
 	}
 	
 	private List<QualityModel> parseQualityRecord(Element parentElem){
-		List<QualityModel> qualityMod =  null;
+		List<QualityModel> qualityMod =   new ArrayList<QualityModel>();;
 		if(parentElem != null){
 			for(Element qualityElem :  parentElem.getChildren(qualityTag, swe2Ns)){
-				if(qualityMod == null)
-					qualityMod = new ArrayList<QualityModel>();
+			
 				for(Element catElem : qualityElem.getChildren()){
 					//if(categoryDefinition.equals(catElem.getAttributeValue(attDefinitionTag)) ||
 						//	parentElem.getName().equals(countTag)){

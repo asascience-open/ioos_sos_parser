@@ -37,14 +37,12 @@ public class IoosParserTest {
 					"./TestFiles/SWE-SingleStation-SingleProperty-TimeSeries.xml" ).getCanonicalPath();
 			sweMultiRecordFile = new java.io.File( 
 					"./TestFiles/SWE-MultiStation-TimeSeries.xml" ).getCanonicalPath();
-//			sweMultiQcRecordFile = new java.io.File( 
-//					"./TestFiles/SWE-MultiStation-TimeSeries_QC.xml" ).getCanonicalPath();
+		
 			sweMultiQcRecordFile = new java.io.File( 
 					"./TestFiles/new-TimeSeries_QC.xml" ).getCanonicalPath();
 			sweSingleStationProfile = new java.io.File( 
 					"./TestFiles/SWE-SingleStation-TimeSeriesProfile.xml" ).getCanonicalPath();
-//			sweSingleProfileQc = new java.io.File( 
-//					"./TestFiles/SWE-SingleStation-TimeSeriesProfile_QC.xml" ).getCanonicalPath();
+		
 			sweSingleProfileQc = new java.io.File( 
 					"./TestFiles/new-TimeSeriesProfile_QC.xml" ).getCanonicalPath();
 			describeSensNetFile = new java.io.File( 
@@ -56,20 +54,41 @@ public class IoosParserTest {
 				 GetObservation getObsModel = gop.parseGO(gopFile);
 				 List<MemberObservation> memObs = getObsModel.getMemberObservation();
 				 if(memObs != null){
-					 if(!true){
+
+					 System.out.println("BEGIN GET OBSERVATION - MULTI QC TIME SERIES");
 					 SweDataRecordParser sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweMultiQcRecordFile, memObs.get(0));
-					 }
-					 else {
-					 SweDataRecordParser sweParser = new SweDataRecordParser("timeSeriesProfile");
-					//sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
-					 sweParser.parseSweDataRecord(sweSingleProfileQc, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - MULTI QC TIME SERIES");
 
-					 }
+					 System.out.println("BEGIN GET OBSERVATION - SINGLE QC TIME SERIES PROFILE");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser.parseSweDataRecord(sweSingleProfileQc, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - SINGLE QC TIME SERIES PROFILE");
+
+
+					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");
+					 
+					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
+					 sweParser = new SweDataRecordParser("timeSeries");
+					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES ");
+
+					 
+					 System.out.println("BEGIN GET OBSERVATION - MULTI TIME SERIES ");
+					 sweParser = new SweDataRecordParser("timeSeries");
+					 sweParser.parseSweDataRecord(sweMultiRecordFile, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - MULTIE TIME SERIES ");
 				 }
-				 
-				 System.out.println("Results: ");
-				 System.out.println(getObsModel.toString());
+
+
 
 				 System.out.println("----BEGIN GET CAPABILITIES");
 				 GetCapabilities getCapsModel = gc.parseGO(getCapFile);
