@@ -1,4 +1,4 @@
-package com.asascience.ioss.parser;
+package com.asascience.ioos.parser;
 
 import java.io.IOException;
 import java.util.List;
