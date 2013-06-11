@@ -28,13 +28,13 @@ GetCapabilitiesParser gc = new GetCapabilitiesParser();
 DescribeSensorStationParser dss = new DescribeSensorStationParser();
 ```
 ### Obtain Data Model
-
+```java
 GetObservation getObsModel = gop.parseGO(gopFile);
-...
+```
 
 ## Maven Repo
 
-Maven repository link:
+To use this library, add the following Maven repository to your pom.xml:
 
 ```xml
 <repositories>
@@ -46,7 +46,7 @@ Maven repository link:
 </repositories>
 ```
 
-place this dependency into pom.xml file:
+And place this dependency into you pom.xml:
 
 ```xml
 <dependency>
@@ -57,8 +57,8 @@ place this dependency into pom.xml file:
 ```
 
 ## Roadmap
-* implement parsing library for IOOS SWE 1.0
+*  Full support for the IOOS SWE 1.0 templates
 
 
 ## Contributors
-* Cheryl Morse <CMorse@asascience.com>
+*  Cheryl Morse <CMorse@asascience.com>
