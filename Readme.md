@@ -1,8 +1,12 @@
-# IOOS SWE SOS Parser - A XML Parser library for Sensor Web Enablement (SWE) Common Data Model (CDM)
+# IOOS SWE SOS Parseing Library 
+===================
 
-*Note: OGC Sensor Web Enablement (SWE) Common Data Model (CDM) Encoding Standard defines low level data models for exchanging sensor related data between nodes of the OGC SWE framework. These models allow applications and/or servers to structure, encode and transmit sensor datasets in a self describing and semantically enabled way. 
+A XML Parser library for Sensor Web Enablement (SWE) Common Data Model (CDM)
+--------------------
 
-This parsing library is for IOOS SWE 1.0.*
+<em>Note: OGC Sensor Web Enablement (SWE) Common Data Model (CDM) Encoding Standard defines low level data models for exchanging sensor related data between nodes of the OGC SWE framework. These models allow applications and/or servers to structure, encode and transmit sensor datasets in a self describing and semantically enabled way. 
+
+This parsing library is for IOOS SWE 1.0.</em>
 
 this parser parse the following data services into the data model:
 
@@ -53,8 +57,8 @@ place this dependency into pom.xml file:
 ```
 
 ## Roadmap
-* Development of a standardized Metadata concept, possibly through SensorML and/or ISO 19115-2
+* implement parsing library for IOOS SWE 1.0
 
 
 ## Contributors
-* Cheryl Morse CMorse<@asascience.com>
+* Cheryl Morse <CMorse@asascience.com>
