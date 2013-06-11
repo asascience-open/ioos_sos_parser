@@ -51,7 +51,7 @@ place this dependency into pom.xml file:
 ```xml
 <dependency>
   <groupId>com.asascience</groupId>
-  <artifactId>ncsos</artifactId>
+  <artifactId>ioos_sos_parser</artifactId>
   <version>RC1-SNAPSHOT</version>
 </dependency>
 ```
