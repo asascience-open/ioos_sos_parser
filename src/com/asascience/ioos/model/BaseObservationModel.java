@@ -37,7 +37,8 @@ public class BaseObservationModel {
 	
 
 	public String toString() {
-		String memberStr =  "description: " + description + "\n";
+		String memberStr =  "ID " + observationName + "\n" +
+				"description: " + description + "\n";
 		if(startSamplingTime != null)
 			memberStr +=	"start time: " +startSamplingTime.toString() + "\n";
 		if(endSamplingTime != null)

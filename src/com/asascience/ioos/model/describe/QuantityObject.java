@@ -1,6 +1,8 @@
 package com.asascience.ioos.model.describe;
 
 public class QuantityObject {
+	String quantityName;
+	
 	String quantityDef;
 	String unitOfMeasure;
 	public String toString (){
@@ -20,5 +22,11 @@ public class QuantityObject {
 	}
 	public void setUnitOfMeasure(String unitOfMeasure) {
 		this.unitOfMeasure = unitOfMeasure;
+	}
+	public String getQuantityName() {
+		return quantityName;
+	}
+	public void setQuantityName(String quantityName) {
+		this.quantityName = quantityName;
 	}
 }

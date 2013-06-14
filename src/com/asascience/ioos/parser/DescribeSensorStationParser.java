@@ -2,6 +2,9 @@ package com.asascience.ioos.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,23 +80,54 @@ public class DescribeSensorStationParser  extends BaseParser{
 		
 	}
 	
-	public DescribeSensorStation parseDesribeStation(String xmlFileName) 
+	
+	public DescribeSensorStation parseDescribeStation(URL xmlUrl) throws IoosSosParserException{
+		DescribeSensorStation describeStation = null;
+		URLConnection connect;
+		try {
+			connect = xmlUrl.openConnection();
+	
+		InputStream isReader = connect.getInputStream();
+		if(isReader != null){
+			Document xmlDoc = new SAXBuilder().build(isReader);
+			describeStation = parseDescribeStation(xmlDoc);
+		}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JDOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return describeStation;
+	
+	}
+	
+	
+	private DescribeSensorStation parseDescribeStation(Document xmlDoc) throws IoosSosParserException{
+		DescribeSensorStation describeStation = null;
+		Element root = xmlDoc.getRootElement();
+		describeStation = new DescribeSensorStation();
+
+		initNamespaces(root);
+
+		for(Element capa : root.getChildren(capabilitiesTag, smlNs)){
+			String version = parseVersionMetadata(capa);
+			if(version != null)
+				describeStation.setServiceVersion(version);
+		}
+		parseMemberData(root.getChild(memberTag, smlNs), describeStation);
+		return describeStation;
+	}
+	
+	public DescribeSensorStation parseDescribeStation(String xmlFileName) 
 			throws JDOMException, IOException, IoosSosParserException{
 		File xmlFile = new File(xmlFileName);
 		DescribeSensorStation describeStation = null;
 		if(xmlFile.exists()){
 			describeStation = new DescribeSensorStation();
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
-			Element root = xmlDoc.getRootElement();
-			initNamespaces(root);
-
-			for(Element capa : root.getChildren(capabilitiesTag, smlNs)){
-				String version = parseVersionMetadata(capa);
-				if(version != null)
-					describeStation.setServiceVersion(version);
-			}
-			parseMemberData(root.getChild(memberTag, smlNs), describeStation);
-			
+			describeStation = parseDescribeStation(xmlDoc);
 		}
 		return describeStation;
 	}
@@ -279,15 +313,17 @@ public class DescribeSensorStationParser  extends BaseParser{
 		List<ContactData> contact = new ArrayList<ContactData>();
 		if(contactE != null){
 			Element contactList = contactE.getChild(contactListTag, smlNs);
-			for(Element member : contactList.getChildren(memberTag, smlNs)){
-				ContactData contactData = parseContact(member.getChild(responsiblePartyTag, smlNs));
-				if(contactData != null)
-					contact.add(contactData);
+			if(contactList != null){
+				for(Element member : contactList.getChildren(memberTag, smlNs)){
+					ContactData contactData = parseContact(member.getChild(responsiblePartyTag, smlNs));
+					if(contactData != null)
+						contact.add(contactData);
+				}
 			}
 		}
 		return contact;
 	}
-	
+
 	private List<LatLonPoint> parseLocationPts(Element locationElem){
 		List<LatLonPoint> latLonPoints = new ArrayList<LatLonPoint>();
 		if(locationElem != null){
@@ -295,21 +331,25 @@ public class DescribeSensorStationParser  extends BaseParser{
 				if(point.getNamespace().equals(gmlNs)){
 					if(point.getName().equals(gmlPointTag)){
 						String rep = point.getChildText(gmlPosTag, gmlNs);
-						String [] ll = rep.split(" ");
-						if(ll.length == 2){
-							LatLonPoint llPt = new LatLonPoint(Double.valueOf(ll[0]), 
-									   							Double.valueOf(ll[1]));
-							latLonPoints.add(llPt);
+						if(rep != null){
+							String [] ll = rep.split(" ");
+							if(ll.length == 2){
+								LatLonPoint llPt = new LatLonPoint(Double.valueOf(ll[0]), 
+										Double.valueOf(ll[1]));
+								latLonPoints.add(llPt);
+							}
 						}
 					}
 					else if(point.getName().equals(lineStringTag)){
 						String rep = point.getChildText(gmlPosTag, gmlNs);
-						String [] ll = rep.split(" ");
-						if(ll.length % 2 == 0){
-							for(int i = 0; i < ll.length; i = i + 2){
-								LatLonPoint llPt = new LatLonPoint(Double.valueOf(ll[i]), 
-			   							Double.valueOf(ll[i + 1]));
-								latLonPoints.add(llPt);
+						if(rep != null){
+							String [] ll = rep.split(" ");
+							if(ll.length % 2 == 0){
+								for(int i = 0; i < ll.length; i = i + 2){
+									LatLonPoint llPt = new LatLonPoint(Double.valueOf(ll[i]), 
+											Double.valueOf(ll[i + 1]));
+									latLonPoints.add(llPt);
+								}
 							}
 						}
 					}
@@ -331,6 +371,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 						String def = quantity.getAttributeValue(attDefinitionTag);
 						QuantityObject quantObject = new QuantityObject();
 						quantObject.setQuantityDef(def);
+						quantObject.setQuantityName(name);
 						Element uom = quantity.getChild(uomTag, sweNs);
 						if(uom != null)
 							quantObject.setUnitOfMeasure(uom.getAttributeValue(codeTag));
@@ -346,42 +387,48 @@ public class DescribeSensorStationParser  extends BaseParser{
 	
 	private List<ComponentData> parseComponents(Element components) throws IoosSosParserException{
 		List<ComponentData> componentDataList = new ArrayList<ComponentData>();
-	
+
 		if(components != null){
 			Element componentList = components.getChild(componentListTag, smlNs);
 			if(componentList != null){
 				for(Element comp : componentList.getChildren(componentTag, smlNs)){
-					Element systemElem = comp.getChild(systemTag, smlNs);
 					ComponentData componentData = new ComponentData();
-					componentData.setDescription(systemElem.getChildText(gmlDescriptionTag, gmlNs));
-					
-					Element childElem = systemElem.getChild(identificationTag, smlNs);
-					if(childElem != null) {
-						componentData.setIdentificationReference(childElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
-						componentData.setIdentificationMap(parseIdentificationRecords(childElem));
+					componentData.setComponentName(comp.getAttributeValue(nameTag));
+					Element systemElem = comp.getChild(systemTag, smlNs);
+
+					if(systemElem != null){
+
+						componentData.setDescription(systemElem.getChildText(gmlDescriptionTag, gmlNs));
+
+						Element childElem = systemElem.getChild(identificationTag, smlNs);
+						if(childElem != null) {
+							componentData.setIdentificationReference(childElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
+							componentData.setIdentificationMap(parseIdentificationRecords(childElem));
+						}
+
+						childElem = systemElem.getChild(documentationTag, smlNs);
+						if(childElem != null)
+							componentData.setDocumentationReference(childElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
+						// parse the date data
+
+						DateTime[] startEnd = parseTimeCapabilitiesRecord(systemElem.getChild(capabilitiesTag, smlNs));
+						if(startEnd != null && startEnd.length == 2){
+							componentData.setComponentStartDate(startEnd[0]);
+							componentData.setComponentEndDate(startEnd[1]);
+
+						}
+
+
+						componentData.setLocationPoints(parseLocationPts(
+								systemElem.getChild(locationTag, smlNs)));
+						componentData.setOutputQuantitiesMap(parseOutputList(
+								systemElem.getChild(outputsTag, smlNs)));
 					}
-					
-					childElem = systemElem.getChild(documentationTag, smlNs);
-					if(childElem != null)
-						componentData.setDocumentationReference(childElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
-					// parse the date data
-				
-					DateTime[] startEnd = parseTimeCapabilitiesRecord(systemElem.getChild(capabilitiesTag, smlNs));
-					if(startEnd != null && startEnd.length == 2){
-						componentData.setComponentStartDate(startEnd[0]);
-						componentData.setComponentEndDate(startEnd[1]);
-						
-					}
-				
-					
-					componentData.setLocationPoints(parseLocationPts(
-							systemElem.getChild(locationTag, smlNs)));
-					componentData.setOutputQuantitiesMap(parseOutputList(
-							systemElem.getChild(outputsTag, smlNs)));
 					componentDataList.add(componentData);
+
 				}
-					
-				
+
+
 			}
 		}
 		return componentDataList;
@@ -405,7 +452,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 		
 		if(docElem != null){
 			Element docElemList = docElem.getChild(documentListTag, smlNs);
-			if(docList != null){
+			if(docElemList != null){
 				for(Element member : docElemList.getChildren(memberTag, smlNs)){
 					DocumentationObject doc = parseDocObject(member.getChild(documentTag, smlNs),
 							member.getAttributeValue(nameTag), member.getAttributeValue(arcRoleTag, xlinkNs));
@@ -444,7 +491,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 		
 		if(historyElem != null){
 			Element docElemList = historyElem.getChild(eventListTag, smlNs);
-			if(eventList != null){
+			if(docElemList != null){
 				for(Element member : docElemList.getChildren(memberTag, smlNs)){
 					EventObject event = parseEventObject(member.getChild(eventTag, smlNs));
 					if(event != null){

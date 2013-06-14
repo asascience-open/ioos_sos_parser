@@ -10,9 +10,12 @@ public class EventObject {
 		
 	}
 	public String toString(){
-		return "Date: " + eventDate.toString() +"\n"+
-				"Description " + description+"\n"+
-				"Reference " + documentationLink;
+		String strRep ="";
+		if(eventDate != null)
+			strRep += "Date: " + eventDate.toString() +"\n";
+		strRep += "Description " + description+"\n";
+		strRep += "Reference " + documentationLink;
+		return strRep;
 	}
 	public DateTime getEventDate() {
 		return eventDate;

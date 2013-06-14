@@ -9,7 +9,7 @@ public class Operation {
 	List<DCP> dcpList;
 	String operationName;
 	Map<String, List<String>> parameterAllowedValues;
-	
+	private final String OUTPUT_FORMAT = "outputFormat";
 	public Operation(){
 		dcpList = new ArrayList<DCP>();
 		parameterAllowedValues = new HashMap<String, List<String>>();
@@ -39,7 +39,13 @@ public class Operation {
 			Map<String, List<String>> parameterAllowedValues) {
 		this.parameterAllowedValues = parameterAllowedValues;
 	}
-	
+	public String getOutputFormat(){
+		String format = null;
+		List<String> allowedVals = parameterAllowedValues.get(OUTPUT_FORMAT);
+		if(allowedVals != null)
+			format = allowedVals.get(0);
+		return format;
+	}
 	public String toString(){
 		
 		String strRep = "DCP \n";

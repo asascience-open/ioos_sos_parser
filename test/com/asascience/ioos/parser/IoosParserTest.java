@@ -91,17 +91,17 @@ public class IoosParserTest {
 
 
 				 System.out.println("----BEGIN GET CAPABILITIES");
-				 GetCapabilities getCapsModel = gc.parseGO(getCapFile);
+				 GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
 				 System.out.println(getCapsModel.toString());
 				 System.out.println("----END GET CAPABILITIES");
 				 
 				 System.out.println("----BEGIN DESCRIBE SENSOR NETWORK----");
-				 DescribeSensorStation sensStat = dss.parseDesribeStation(describeSensNetFile);
+				 DescribeSensorStation sensStat = dss.parseDescribeStation(describeSensNetFile);
 				 System.out.println(sensStat.toString());
 				 System.out.println("----END DESCRIBE SENSOR NETWORK----");
 
 				 System.out.println("----BEGIN DESCRIBE SENSOR STATION----");
-				 DescribeSensorStation sensStat2 = dss.parseDesribeStation(describeSensStatFile);
+				 DescribeSensorStation sensStat2 = dss.parseDescribeStation(describeSensStatFile);
 				 System.out.println(sensStat2.toString());
 				 System.out.println("----END DESCRIBE SENSOR STATION----");
 

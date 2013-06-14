@@ -31,10 +31,11 @@ public class DescribeSensorStation {
 				"version " + serviceVersion +"\n";
 		if(boundingBox != null)
 			strRep +=	"Bounding box: \n  " + boundingBox.toString();
-		
-		strRep+="Start Time: " + startSamplingTime.toString() + "\n" +
-				"End Time: " + endSamplingTime.toString() + "\n" + 
-				"Identifiers\n"; 
+		if(startSamplingTime != null)
+			strRep+="Start Time: " + startSamplingTime.toString() + "\n";
+		if(endSamplingTime != null)
+			strRep +="End Time: " + endSamplingTime.toString() + "\n";
+		strRep += "Identifiers\n"; 
 		for(String key : identifierMap.keySet()){
 			strRep += key + "\n";
 			strRep += "   " + identifierMap.get(key).toString();

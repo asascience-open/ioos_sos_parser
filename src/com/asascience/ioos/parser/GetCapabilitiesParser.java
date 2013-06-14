@@ -2,6 +2,9 @@ package com.asascience.ioos.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.joda.time.DateTime;
 
+
+import com.asascience.ioos.exception.IoosSosParserException;
 import com.asascience.ioos.model.AddressModel;
 import com.asascience.ioos.model.BoundingBox;
 import com.asascience.ioos.model.LatLonPoint;
@@ -24,6 +29,7 @@ import com.asascience.ioos.model.capabilities.ServiceProvider;
 
 
 public class GetCapabilitiesParser extends BaseParser {
+	private final String version1_0 = "1.0";
 	private final String serviceIdTag = "ServiceIdentification";
 	private final String titleTag = "Title";
 	private final String abstractTag = "Abstract";
@@ -57,6 +63,7 @@ public class GetCapabilitiesParser extends BaseParser {
 	private final String resultModelTag = "resultModel";
 	private final String responseModeTag = "responseMode";
 	private final String timeTag = "timeTag";
+	
 	public GetCapabilitiesParser(){
 		
 	}
@@ -154,11 +161,13 @@ public class GetCapabilitiesParser extends BaseParser {
 	private void parseOperationsMetadata(Element operationElement, 	GetCapabilities getCap){
 		List<Operation> operationList = new ArrayList<Operation>();
 		if(operationElement != null){
-			Operation operation = new Operation();
 			for(Element operationElem : operationElement.getChildren()){
+				Operation operation = new Operation();
 
 				if(operationElem.getNamespace().equals(owsNs)){
 					if(operationElem.getName().equals(operationTag)){
+						operation.setOperationName(operationElem.getAttributeValue(nameTag));
+
 						for(Element childElem : operationElem.getChildren()){
 							if(childElem.getName().equals(dcpTag)){
 								for(Element dcpElem : childElem.getChildren()){
@@ -200,7 +209,10 @@ public class GetCapabilitiesParser extends BaseParser {
 					}
 					
 				}
+				operationList.add(operation);
+
 			}
+
 		}
 		getCap.setOperationsList(operationList);
 	}
@@ -284,24 +296,77 @@ public class GetCapabilitiesParser extends BaseParser {
 		return obs;
 	}
 
+	public boolean isGetCapabilitiesVersion1(String fileName){
+		boolean isGetCapVers1 = false;
+		try {
+			Document xmlDoc;
+			File xmlFile = new File(fileName);
+			xmlDoc = new SAXBuilder().build(xmlFile);
+			Element root = xmlDoc.getRootElement();
+
+			initNamespaces(root);
+
+			GetCapabilities getCap = new GetCapabilities();
+			parseOperationsMetadata(root.getChild(operationsMetadataTag, owsNs), getCap);
+			if(getCap != null && version1_0.equals(getCap.getVersion()))
+				isGetCapVers1 = true;
+		} catch (JDOMException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return isGetCapVers1;
+		
+	}
 	
-	public GetCapabilities parseGO(String xmlFileName) throws JDOMException, IOException{
+	
+	public GetCapabilities parseGetCapabilities(URL xmlUrl) throws IoosSosParserException{
+		URLConnection connect;
+		GetCapabilities getCap = null;
+
+		try {
+			connect = xmlUrl.openConnection();
+
+			InputStream isReader = connect.getInputStream();
+			if(isReader != null){
+				getCap = new GetCapabilities();
+				Document xmlDoc = new SAXBuilder().build(isReader);
+				parseGetCapabilities(xmlDoc, getCap);
+
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JDOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return getCap;
+	}
+
+	private void parseGetCapabilities(Document xmlDoc, GetCapabilities getCap) throws IoosSosParserException{
+		Element root = xmlDoc.getRootElement();
+		initNamespaces(root);
+		getCap.setServiceId( parseServiceIdentification(root.getChild(serviceIdTag, owsNs)));
+		getCap.setServiceProvider(parseServiceProvider(root.getChild(serviceProviderTag, owsNs)));
+		parseOperationsMetadata(root.getChild(operationsMetadataTag, owsNs), getCap);
+		
+		Element content = root.getChild(contentsTag, sosNs);
+		if(content != null)
+			getCap.setObservationList(parseOfferingList(
+					content.getChild(this.observationOfferingListTag, sosNs)));
+		
+	}
+	
+	public GetCapabilities parseGetCapabilities(String xmlFileName) 
+			throws JDOMException, IOException, IoosSosParserException{
 		File xmlFile = new File(xmlFileName);
 		GetCapabilities getCap = null;
 		if(xmlFile.exists()){
 
 			getCap = new GetCapabilities();
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
-			Element root = xmlDoc.getRootElement();
-			initNamespaces(root);
-			getCap.setServiceId( parseServiceIdentification(root.getChild(serviceIdTag, owsNs)));
-			getCap.setServiceProvider(parseServiceProvider(root.getChild(serviceProviderTag, owsNs)));
-			parseOperationsMetadata(root.getChild(operationsMetadataTag, owsNs), getCap);
-			
-			Element content = root.getChild(contentsTag, sosNs);
-			if(content != null)
-				getCap.setObservationList(parseOfferingList(
-						content.getChild(this.observationOfferingListTag, sosNs)));
+			parseGetCapabilities(xmlDoc, getCap);
 		}
 		return getCap;
 	}

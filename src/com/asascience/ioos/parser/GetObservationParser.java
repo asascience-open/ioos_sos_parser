@@ -5,8 +5,10 @@
  package com.asascience.ioos.parser;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import org.jdom2.Attribute;
@@ -247,23 +249,49 @@ public class GetObservationParser extends BaseParser {
 		}
 	}
 	
+	public GetObservation parseGO(URL xmlUrl) throws IOException, IoosSosParserException {
+		URLConnection connect;
+		GetObservation getObservation = null;
+
+		connect = xmlUrl.openConnection();
+
+		InputStream isReader = connect.getInputStream();
+		if(isReader != null){
+			getObservation = new GetObservation();
+			try {
+				Document xmlDoc = new SAXBuilder().build(isReader);
+				parseGO(xmlDoc, getObservation);
+
+				
+			} catch (JDOMException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return getObservation;
+
+	}
+
+	private void parseGO(Document xmlDoc, GetObservation getObservation)
+			throws MalformedURLException, IoosSosParserException{
+		Element root = xmlDoc.getRootElement();
+		initNamespaces(root);
+
+		parseGmlMetaData(root, getObservation);
+		parseMembers(root, getObservation);
+	}
+	
 	
 	
 	public GetObservation parseGO(String xmlFileName) throws JDOMException, IOException, IoosSosParserException{
 		File xmlFile = new File(xmlFileName);
 		GetObservation getObservation = null;
-
 		if(xmlFile.exists()){
 
 			getObservation = new GetObservation();
 			Document xmlDoc = new SAXBuilder().build(xmlFile);
-			Element root = xmlDoc.getRootElement();
-			initNamespaces(root);
-
-			parseGmlMetaData(root, getObservation);
-			parseMembers(root, getObservation);
-
-
+			parseGO(xmlDoc, getObservation);
 		}
 		return getObservation;
 	}

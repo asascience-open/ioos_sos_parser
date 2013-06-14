@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.asascience.ioos.model.describe.DescribeSensorStation;
+
 public class GetCapabilities {
 	private ServiceIdentification serviceId;
 	private ServiceProvider serviceProvider;
@@ -13,7 +15,7 @@ public class GetCapabilities {
 	private List<Observation> observationList;
 	String version;
 	
-
+	private List<DescribeSensorStation> describeSensors;
 	String refTitle;
 	String refLink;
 
@@ -21,11 +23,23 @@ public class GetCapabilities {
 		operationsList = new ArrayList<Operation>();
 		capabilitiesParameters = new HashMap<String, List<String>>();
 		observationList = new ArrayList<Observation>();
+		describeSensors = new ArrayList<DescribeSensorStation>();
 	}
 	
+	public List<DescribeSensorStation> getDescribeSensors() {
+		return describeSensors;
+	}
+
+	public void setDescribeSensors(List<DescribeSensorStation> describeSensors) {
+		this.describeSensors = describeSensors;
+	}
+
 	public String toString(){
-		String strRep = serviceId.toString() +"\n";
-		strRep += serviceProvider.toString() + "\n";
+		String strRep = "";
+		if(serviceId != null)
+			strRep += serviceId.toString() +"\n";
+		if(serviceProvider != null)
+			strRep += serviceProvider.toString() + "\n";
 		strRep += "Parameters " + "\n";
 		for(String key : capabilitiesParameters.keySet()){
 			strRep += "  " + key + "\n";
@@ -106,5 +120,33 @@ public class GetCapabilities {
 
 	public void setRefLink(String refLink) {
 		this.refLink = refLink;
+	}
+	
+	public Operation getOperation(String operationName){
+		Operation op = null;
+		for(Operation tempOp : this.operationsList){
+			System.out.println(tempOp.operationName);
+			if(operationName.equals(tempOp.getOperationName())){
+				op = tempOp;
+				break;
+			}
+		}
+		if(op != null)
+		System.out.println("returning "+op.toString());
+		else
+			System.out.println(operationsList.size());
+		return op;
+	}
+	
+	public Observation getObservation(String offeringName){
+		Observation observationOffering = null;
+		for(Observation obs : observationList){
+			if(obs.getObservationName().equals(offeringName)) {
+				observationOffering = obs;
+				break;
+			}
+				
+		}
+		return observationOffering;
 	}
 }
