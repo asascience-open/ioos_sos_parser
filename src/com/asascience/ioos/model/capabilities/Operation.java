@@ -9,7 +9,15 @@ public class Operation {
 	List<DCP> dcpList;
 	String operationName;
 	Map<String, List<String>> parameterAllowedValues;
-	private final String OUTPUT_FORMAT = "outputFormat";
+	public final static String PROCEDURE = "procedure";
+	public final static String OFFERING = "offering";
+	public final static String AND_QUERY  = "&";
+	public final static String REQUEST = "request";
+	public final static String SERVICE = "service";
+	public final static String VERSION = "version";
+	public final static String OUTPUT_FORMAT = "outputFormat";
+	public final static String RESPONSE_FORMAT = "responseFormat";
+	public final static String OBSERVED_PROPERTY = "observedProperty";
 	public Operation(){
 		dcpList = new ArrayList<DCP>();
 		parameterAllowedValues = new HashMap<String, List<String>>();
@@ -39,6 +47,9 @@ public class Operation {
 			Map<String, List<String>> parameterAllowedValues) {
 		this.parameterAllowedValues = parameterAllowedValues;
 	}
+	
+	
+	
 	public String getOutputFormat(){
 		String format = null;
 		List<String> allowedVals = parameterAllowedValues.get(OUTPUT_FORMAT);

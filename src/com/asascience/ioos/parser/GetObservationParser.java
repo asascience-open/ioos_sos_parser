@@ -40,7 +40,6 @@ public class GetObservationParser extends BaseParser {
 	private final String omProcessTag = "Process";
 	private final String sweCompositePhenomTag ="CompositePhenomenon";
 	private final String sweComponentTag = "component";
-	private final String gmlIdTag = "id";
 	private final String dimensionTag = "dimension";
 	private final String omObservedPropertyTag = "observedProperty";
 	private final String omFeatureTag = "featureOfInterest";
@@ -82,13 +81,15 @@ public class GetObservationParser extends BaseParser {
 			// get the station keys
 			Element processElem = procedureElem.getChild(omProcessTag, omNs);
 			String stationKey;
-			for(Element stationElem : processElem.getChildren(memberTag, gmlNs)){
-				stationKey = stationElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs);
-				if(memberObs.getFeatureCollectionProperties() ==  null){
-					FeatureCollectionModel featureProp = new FeatureCollectionModel();
-					memberObs.setFeatureCollectionProperties(featureProp);
+			if(processElem != null){
+				for(Element stationElem : processElem.getChildren(memberTag, gmlNs)){
+					stationKey = stationElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs);
+					if(memberObs.getFeatureCollectionProperties() ==  null){
+						FeatureCollectionModel featureProp = new FeatureCollectionModel();
+						memberObs.setFeatureCollectionProperties(featureProp);
+					}
+					memberObs.getFeatureCollectionProperties().addStationKey(stationKey);
 				}
-				memberObs.getFeatureCollectionProperties().addStationKey(stationKey);
 			}
 		}
 
@@ -196,7 +197,6 @@ public class GetObservationParser extends BaseParser {
 		
 			Element compositeElem = obPropElem.getChild(sweCompositePhenomTag, sweNs);
 			
-			System.out.println(compositeElem.toString());
 			if(compositeElem != null) {
 				obPropModel.setPhonemononName(compositeElem.getChildText(nameTag, gmlNs));
 				obPropModel.setDimension(compositeElem.getAttributeValue(dimensionTag));

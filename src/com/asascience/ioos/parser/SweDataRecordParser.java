@@ -142,7 +142,7 @@ public class SweDataRecordParser extends BaseParser {
 			Element dataRecord = fieldRecord.getChild(dataRecordTag, swe2Ns);
 			if(dataRecord != null){
 			String definitionStr = dataRecord.getAttributeValue(attDefinitionTag);
-			if(definitionStr.equals(stationsStaticDataDef))
+			if(stationsStaticDataDef.equals(definitionStr))
 				isStatic = true;
 			}
 		}

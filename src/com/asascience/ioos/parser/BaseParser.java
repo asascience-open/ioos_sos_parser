@@ -56,6 +56,7 @@ public class BaseParser {
 	protected final String emailTag = "ElectronicMailAddress";
 	protected final String owsContactInfoTag = "ContactInfo";
 	protected final String smlContactInfoTag = "contactInfo";
+	protected final String gmlIdTag = "id";
 
 	protected final String voiceTag = "Voice";
 	protected final String quantityTag = "Quantity";

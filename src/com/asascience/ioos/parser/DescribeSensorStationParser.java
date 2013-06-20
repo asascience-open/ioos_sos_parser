@@ -376,7 +376,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 						if(uom != null)
 							quantObject.setUnitOfMeasure(uom.getAttributeValue(codeTag));
 						if(def != null)
-							outputMap.put(def, quantObject);
+							outputMap.put(name, quantObject);
 					}
 				}
 				

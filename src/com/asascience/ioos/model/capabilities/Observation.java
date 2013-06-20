@@ -14,6 +14,7 @@ public class Observation extends BaseObservationModel{
 	String responseFormat;
 	String resultModel;
 	String responseMode;
+	String offeringID;
 	BoundingBox boundingBox;
 	public Observation(){
 		observedPropertiesRefList = new ArrayList<String>();
@@ -73,5 +74,13 @@ public class Observation extends BaseObservationModel{
 
 	public void setBoundingBox(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
+	}
+
+	public String getOfferingID() {
+		return offeringID;
+	}
+
+	public void setOfferingID(String offeringID) {
+		this.offeringID = offeringID;
 	}
 }

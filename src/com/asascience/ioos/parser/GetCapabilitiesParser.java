@@ -234,6 +234,7 @@ public class GetCapabilitiesParser extends BaseParser {
 		Observation obs = null;
 		if(observation != null){
 			obs = new Observation();
+			obs.setOfferingID(observation.getAttributeValue(gmlIdTag, gmlNs));
 			obs.setDescription(observation.getChildText(gmlDescriptionTag, gmlNs));
 			obs.setObservationName(observation.getChildText(nameTag, gmlNs));
 			obs.setObservationSrsName(observation.getChildText(gmlSrsNameTag, gmlNs));
