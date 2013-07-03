@@ -127,7 +127,6 @@ public class GetObservationParser extends BaseParser {
 			}
 			Element featureCollectionElem = featureElem.getChild(gmlFeatureCollectionTag, gmlNs);
 			if(featureCollectionElem != null){
-				System.out.println("Feature coll"+featureCollectionElem.toString());
 				Element childDataElem = featureCollectionElem.getChild(gmlMetaDataTag, gmlNs);
 				if(childDataElem != null){
 					Element featureType = childDataElem.getChild(nameTag, gmlNs);
@@ -192,7 +191,6 @@ public class GetObservationParser extends BaseParser {
 	// parse the om:observedProperty record
 	private void parseObservedProperties(Element obPropElem, MemberObservation memberObs){
 		if(obPropElem != null){
-			System.out.println("--swe composite " + obPropElem.toString());
 			ObservedPropertyModel obPropModel = new ObservedPropertyModel();
 		
 			Element compositeElem = obPropElem.getChild(sweCompositePhenomTag, sweNs);
@@ -234,7 +232,6 @@ public class GetObservationParser extends BaseParser {
 			if(gmlMetaData.getAttributeValue(xlinkAttributeTitleTag, xlinkNs) != null){
 				Element metaDataElement = gmlMetaData.getChild(genericMetaDataTag, gmlNs);
 				if(metaDataElement != null){
-						System.out.println("----"+metaDataElement.getChildText(gmlDescriptionTag, gmlNs)+"-----");
 						getObservationModel.setGmlDescription(metaDataElement.getChildText(gmlDescriptionTag, gmlNs));
 					
 				}

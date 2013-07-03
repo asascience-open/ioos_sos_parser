@@ -30,7 +30,6 @@ public class SensorProperty extends PropertyObject {
 		return copy;
 	}
 	
-
 	public PropertyType getPropertyType() {
 		return propertyType;
 	}

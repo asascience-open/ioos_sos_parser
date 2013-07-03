@@ -22,18 +22,12 @@ import com.asascience.ioos.model.SensorModel;
 import com.asascience.ioos.model.SensorProperty.PropertyType;
 import com.asascience.ioos.model.StationModel;
 import com.asascience.ioos.model.SweDataRecord;
+import com.asascience.ioos.model.SweDataRecord.SweFileType;
 import com.asascience.ioos.model.VectorModel;
 
 
 public class SweDataRecordParser extends BaseParser {
-	public enum SweFileType{
-		TIME_SERIES("timeSeries"),
-		TIME_SERIES_PROFILE("timeSeriesProfile");
-		private final String typeName;
-		SweFileType(String typeName){
-			this.typeName = typeName;
-		}
-	}
+
 	private SweFileType sweFileType;
 
 	private String decimalSeparator = ".";
@@ -86,9 +80,11 @@ public class SweDataRecordParser extends BaseParser {
 	private final String platformLocationDef ="http://www.opengis.net/def/property/OGC/0/PlatformLocation";
 	private final String heightDefinition="http://mmisw.org/ont/cf/parameter/height";
 	private final String profileBinsDefinition="http://mmisw.org/ont/ioos/definition/profileBins";
+	
+	
 	public SweDataRecordParser(String sweFileTypeStr){
 		for(SweFileType type : SweFileType.values()){
-			if (type.typeName.equals(sweFileTypeStr)){
+			if (type.getTypeName().equals(sweFileTypeStr)){
 				this.sweFileType = type;
 				break;
 			}
@@ -130,7 +126,7 @@ public class SweDataRecordParser extends BaseParser {
 		
 		
 		
-		
+		sweRecord.setFileType(sweFileType);
 		memberObs.setSweDataRecords(sweRecord);
 		
 		return;
@@ -165,26 +161,27 @@ public class SweDataRecordParser extends BaseParser {
 				for(Element childPropertyField : stationField.getChildren()) {
 					elemDef = childPropertyField.getAttributeValue(attDefinitionTag);
 					// station id record
-					if(elemDef.equals(stationIdDefinition)) {
-						Element stationTextElem = stationField.getChild(textTag, swe2Ns);
-						// process the station definitions
-						if(stationTextElem != null){
-							String stationFullId = stationTextElem.getChildText(valueTag, swe2Ns);
-							sweRecord.addStationIdMap(dataRecordId, stationFullId);
-							List<QualityModel> qualityList = parseQualityRecord(stationTextElem);
-							if(qualityList != null)
-								station.getStationQuality().addAll(qualityList);
+					if(elemDef != null){
+						if( elemDef.equals(stationIdDefinition)) {
+							Element stationTextElem = stationField.getChild(textTag, swe2Ns);
+							// process the station definitions
+							if(stationTextElem != null){
+								String stationFullId = stationTextElem.getChildText(valueTag, swe2Ns);
+								sweRecord.addStationIdMap(dataRecordId, stationFullId);
+								List<QualityModel> qualityList = parseQualityRecord(stationTextElem);
+								if(qualityList != null)
+									station.getStationQuality().addAll(qualityList);
+							}
+						}
+						else if(elemDef.equals(platformLocationDef)){
+							stationPlatformLocation = parseVectorLocationRecord(childPropertyField);
+							station.setPlatformLocation(stationPlatformLocation);
+						}
+						else if(elemDef.equals(this.sensorListDefintion)){
+							station.getSensorIdtoSensorDataMap().putAll(
+									parseStaticSensorRecord(childPropertyField, sweRecord));
 						}
 					}
-					else if(elemDef.equals(platformLocationDef)){
-						stationPlatformLocation = parseVectorLocationRecord(childPropertyField);
-						station.setPlatformLocation(stationPlatformLocation);
-					}
-					else if(elemDef.equals(this.sensorListDefintion)){
-						station.getSensorIdtoSensorDataMap().putAll(
-								 parseStaticSensorRecord(childPropertyField, sweRecord));
-					}
-
 				}
 			}
 			sweRecord.getStationModelMap().put(dataRecordId, station);
@@ -208,6 +205,7 @@ public class SweDataRecordParser extends BaseParser {
 							// parse the sensor height field
 							if(heightDefinition.equals(sensorFieldDefStr)){
 								Coordinate zCoord = new Coordinate();
+								zCoord.setCoordinateName(sensorFields.getAttributeValue(nameTag));
 								zCoord.setAxisId(sensorFieldType.getAttributeValue(axisIdTag));
 								zCoord.setReferenceFrame(sensorFieldType.getAttributeValue(referenceFrameTag));
 								Element childElem = sensorFieldType.getChild(uomTag, swe2Ns);
@@ -345,7 +343,7 @@ public class SweDataRecordParser extends BaseParser {
 		// Get the static data for each station
 		for(Element fieldStationId :  dataRecord.getChildren(fieldTag, swe2Ns)){
 			 childRecDef = fieldStationId.getChild(dataRecordTag, swe2Ns).getAttributeValue(attDefinitionTag);
-			 if(childRecDef.equals(stationShortIdDefinition))
+			 if(childRecDef != null && childRecDef.equals(stationShortIdDefinition))
 				 parseStationRecord( fieldStationId.getChild(dataRecordTag, swe2Ns), sweRecord);
 			
 		}
@@ -441,6 +439,7 @@ public class SweDataRecordParser extends BaseParser {
 			Integer timeDataIndex = null;
 			Integer sensorDataIndex = null;
 			List<QualityModel> qualityMod = null;
+			String propertyName = null;
 			if(dataRecord != null &&  (sensorObservationDefiniton.equals(dataRecord.getAttributeValue(attDefinitionTag)))) {
 				int currIndex = 0;
 				for(Element fieldRecord : dataRecord.getChildren(fieldTag, swe2Ns)){
@@ -448,6 +447,8 @@ public class SweDataRecordParser extends BaseParser {
 					//parse the time record for the sensors;
 					if((childField = fieldRecord.getChild(timeTag, swe2Ns)) != null){
 						if(samplingTimeDefinition.equals(childField.getAttributeValue(attDefinitionTag))){
+							propertyName = fieldRecord.getAttributeValue(nameTag);
+
 							qualityMod = parseQualityRecord(childField);
 							Element uom = childField.getChild(uomTag, swe2Ns);
 							if(uom != null)
@@ -478,7 +479,7 @@ public class SweDataRecordParser extends BaseParser {
 							timeProp.setSensorType(samplingTimeDefinition);
 							timeProp.setPropertyType(PropertyType.TIME);
 							timeProp.setSensorUnitOfMeasure(timeUomRef);
-
+							timeProp.setPropertyName(propertyName);
 							List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
 							propertyList.add(timeProp);
 							propertyList = this.addQualityModelsToPropertyList(propertyList, qualityMod, timeProp);
@@ -716,14 +717,14 @@ public class SweDataRecordParser extends BaseParser {
 		return propertyList;
 	}
 	
-	private List<SensorProperty> parseQuantityField(Element quantityElem){
+	private List<SensorProperty> parseQuantityField(Element quantityElem, String fieldName){
 		List<SensorProperty> propertyList = new ArrayList<SensorProperty>();
 		List<QualityModel> qualityMod = null;
 		if(quantityElem != null && (quantityElem.getName().equals(quantityTag) ||
 				quantityElem.getName().equals(quantityRangeTag))){
 
 				SensorProperty sensorData = new SensorProperty();
-
+				sensorData.setPropertyName(fieldName);
 				String sensorTypeDef = quantityElem.getAttributeValue(attDefinitionTag);
 				qualityMod = parseQualityRecord(quantityElem);
 				
@@ -731,6 +732,7 @@ public class SweDataRecordParser extends BaseParser {
 				if(uom != null) {
 					String uomStr = uom.getAttributeValue(codeTag);
 					sensorData.setSensorUnitOfMeasure(uomStr);
+				
 				}
 				processNilValue(sensorData, quantityElem);
 				sensorData.setSensorType(sensorTypeDef);
@@ -809,7 +811,8 @@ public class SweDataRecordParser extends BaseParser {
 				}
 				else { 
 				
-					sensorProperty.addAll(parseQuantityField(childField));
+					sensorProperty.addAll(parseQuantityField(childField, 
+							sensorField.getAttributeValue(nameTag)));
 			
 					if(childField.getName().equals(countTag)){
 						SensorProperty sensorData = new SensorProperty();
@@ -924,7 +927,7 @@ public class SweDataRecordParser extends BaseParser {
 	
 	private List<QualityModel> parseElementCount(Element elementCount,  SweDataRecord sweRecord){
 		Integer dataRows = 0;
-		List<QualityModel> qualityModel = null;
+		List<QualityModel> qualityModel = new ArrayList<QualityModel>();
 		if(elementCount != null) {
 			Element count = elementCount.getChild(countTag, swe2Ns);
 			if(count != null) {

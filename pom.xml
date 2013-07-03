@@ -27,10 +27,32 @@
       <name>ASA Nexus SNAPSHOT Repo</name>
       <url>http://geo.asascience.com/nexus/content/repositories/snapshots/</url>
     </repository>
+    
   </distributionManagement>
-
-
+<repositories>
+<repository>
+	  <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+	  <id>unidata</id>
+	  <name>Unidata Artifact Repository</name>
+	  <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/</url>
+	  <layout>default</layout>
+	</repository>
+</repositories>
+            
 	<dependencies>
+	<dependency>
+	  <groupId>edu.ucar</groupId>
+	  <artifactId>netcdf</artifactId>
+	  <version>4.3.16</version>
+	</dependency>
+		
 		<dependency>
 			<groupId>jaxen</groupId>
 			<artifactId>jaxen</artifactId>
@@ -48,7 +70,11 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.2</version>
 		</dependency>
-		
+		<dependency>
+	  <groupId>org.slf4j</groupId>
+	  <artifactId>slf4j-api</artifactId>
+	  <version>1.6.4</version>
+	</dependency>
 		<dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

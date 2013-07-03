@@ -82,18 +82,7 @@ public class SensorModel {
 	}
 	public String toString() {
 		String strRep = "SensorID: " + sensorId + " Height: " + sensorHeight +"\n";
-		
-		if(sensorDataRecord != null){
-			List<SensorProperty> sensorData = sensorDataRecord.getModeledProperties();
 
-			if(sensorData != null){
-				for(SensorProperty modeledProp : sensorData){
-					strRep += "       " + modeledProp.getSensorType() + "  " + modeledProp.getSensorUnitOfMeasure() + "\n";
-
-				}
-			}
-			
-		}
 		strRep += sensorDataRecordToString(binDefRecord,"      Bin Definition");
 		strRep += sensorDataRecordToString(sensorDataRecord,"      Sensor Recorded Properties");
 	

@@ -5,12 +5,22 @@ import java.util.List;
 import java.util.Map;
 
 public class SweDataRecord {
-	
+	public enum SweFileType{
+		TIME_SERIES("timeSeries"),
+		TIME_SERIES_PROFILE("timeSeriesProfile");
+		private final String typeName;
+		SweFileType(String typeName){
+			this.typeName = typeName;
+		}
+		public String getTypeName(){
+			return typeName;
+		}
+	}
 	// Maps the short stationID to the URN station ID
 	Map<String, String> stationIdMap;
 	
 	Map<String, StationModel> stationModelMap;
-
+	SweFileType fileType;
 	
 	Integer numberDataRows;
 	Integer timeColumn;
@@ -19,6 +29,7 @@ public class SweDataRecord {
 		stationIdMap = new HashMap<String,String>();
 		stationModelMap = new HashMap<String, StationModel>();
 		numberDataRows = 0;
+		sectorStartColumn = 0;
 	}
 	
 	
@@ -110,6 +121,24 @@ public class SweDataRecord {
 
 	public void setSectorStartColumn(Integer sectorStartColumn) {
 		this.sectorStartColumn = sectorStartColumn;
+	}
+
+
+
+
+
+
+	public SweFileType getFileType() {
+		return fileType;
+	}
+
+
+
+
+
+
+	public void setFileType(SweFileType fileType) {
+		this.fileType = fileType;
 	}
 
 

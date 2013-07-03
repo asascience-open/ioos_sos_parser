@@ -2,6 +2,7 @@ package com.asascience.ioos.model;
 
 public class PropertyObject {
 	protected String propertyType;
+	protected String propertyName;
 	protected String sensorUnitOfMeasure;
 	protected QualityModel qualityMeasure;
 	public PropertyObject(){
@@ -30,6 +31,12 @@ public class PropertyObject {
 
 	public String getSensorType() {
 		return propertyType;
+	}
+	public String getPropertyName() {
+		return propertyName;
+	}
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
 	}
 
 }

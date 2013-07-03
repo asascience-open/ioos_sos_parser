@@ -5,11 +5,16 @@ import java.util.List;
 
 import org.jdom2.JDOMException;
 
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.NetcdfFileWriteable;
+import ucar.nc2.NetcdfFileWriter;
+
 import com.asascience.ioos.exception.IoosSosParserException;
 import com.asascience.ioos.model.GetObservation;
 import com.asascience.ioos.model.MemberObservation;
 import com.asascience.ioos.model.capabilities.GetCapabilities;
 import com.asascience.ioos.model.describe.DescribeSensorStation;
+import com.asascience.ioos.netcdf.CreateNetcdf;
 import com.asascience.ioos.parser.DescribeSensorStationParser;
 import com.asascience.ioos.parser.GetCapabilitiesParser;
 import com.asascience.ioos.parser.GetObservationParser;
@@ -30,7 +35,9 @@ public class IoosParserTest {
 		 String getCapFile;
 		 String describeSensNetFile;
 		 String describeSensStatFile;
+		 String outputDirectory;
 		try {
+			outputDirectory = new java.io.File( "./TestOut").getCanonicalPath();
 			gopFile = new java.io.File( "./TestFiles/OM-GetObservation.xml" ).getCanonicalPath();
 			getCapFile = new java.io.File( "./TestFiles/SOS-GetCapabilities.xml" ).getCanonicalPath();
 			sweRecordFile  = new java.io.File( 
@@ -54,12 +61,23 @@ public class IoosParserTest {
 				 GetObservation getObsModel = gop.parseGO(gopFile);
 				 List<MemberObservation> memObs = getObsModel.getMemberObservation();
 				 if(memObs != null){
-
+					 SweDataRecordParser sweParser; 
+/*
+					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
+					 sweParser = new SweDataRecordParser("timeSeries");
+					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES ");
+					 
+				
+					
 					 System.out.println("BEGIN GET OBSERVATION - MULTI QC TIME SERIES");
-					 SweDataRecordParser sweParser = new SweDataRecordParser("timeSeries");
+					  sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweMultiQcRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTI QC TIME SERIES");
+					 
+					 
 
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE QC TIME SERIES PROFILE");
 					 sweParser = new SweDataRecordParser("timeSeriesProfile");
@@ -74,23 +92,35 @@ public class IoosParserTest {
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");
 					 
-					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
-					 sweParser = new SweDataRecordParser("timeSeries");
-					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
-					 System.out.println(getObsModel.toString());
-					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES ");
+					
 
-					 
+				*/
 					 System.out.println("BEGIN GET OBSERVATION - MULTI TIME SERIES ");
 					 sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweMultiRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTIE TIME SERIES ");
+					/* 
+
+					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
+					 System.out.println(getObsModel.toString());
+					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");
+					 */
+					 CreateNetcdf ncCreate  = new CreateNetcdf(getObsModel, null);
+					List<NetcdfFile> ncList =  ncCreate.generateNetcdf(outputDirectory);
+					for(NetcdfFile nc : ncList ){
+					
+						System.out.println("NC " +nc.toString());
+					}
+					System.out.println("size " + ncList.size());
+					ncCreate.closeNetcdfFiles();
 				 }
 
 
 
-				 System.out.println("----BEGIN GET CAPABILITIES");
+		/*		 System.out.println("----BEGIN GET CAPABILITIES");
 				 GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
 				 System.out.println(getCapsModel.toString());
 				 System.out.println("----END GET CAPABILITIES");
@@ -104,7 +134,7 @@ public class IoosParserTest {
 				 DescribeSensorStation sensStat2 = dss.parseDescribeStation(describeSensStatFile);
 				 System.out.println(sensStat2.toString());
 				 System.out.println("----END DESCRIBE SENSOR STATION----");
-
+*/
 			} catch (JDOMException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
