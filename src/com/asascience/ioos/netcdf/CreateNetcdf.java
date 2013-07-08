@@ -36,7 +36,6 @@ import com.asascience.ioos.model.describe.DescribeSensorStation;
 
 public class CreateNetcdf {
 	private GetObservation getObs;
-	private DescribeSensorStation describeSens;
 	private static final String UNITS = "units";
 	private static final String STATION = "station";
 	private static final String SENSOR = "sensor";
@@ -54,20 +53,15 @@ public class CreateNetcdf {
 	private static final String FEATURE_TYPE = "featureType";
 	private static final String DATE_FORMAT_STR = "yyyy-MM-dd HH:mm:ss";
 	private static final String BINS = "profile bins";
-	private static final String BIN_VAR = "bins";
-	private final String stationName ="station_name";
 	private List<NetcdfFile> netcdfList;
 	private Dimension obsDimension;
 	private Dimension binDimension;
 	private Dimension numSensors; 
 	private Dimension sensorStrDim;
 	private Dimension timeLenDimension;
-	private SimpleDateFormat dateFormatter;
-	public CreateNetcdf(GetObservation getObs, DescribeSensorStation describeSens){
+	public CreateNetcdf(GetObservation getObs){
 		this.getObs = getObs;
-		this.describeSens = describeSens;
 		netcdfList = new ArrayList<NetcdfFile>();
-		dateFormatter = new SimpleDateFormat(DATE_FORMAT_STR);
 	}
 
 	public List<NetcdfFile> generateNetcdf(String outputDirectory){
@@ -115,12 +109,10 @@ public class CreateNetcdf {
 							writeStationObservationData(stationModel, ncfile);
 
 						} catch (InvalidRangeException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						netcdfList.add(ncfile.getNetcdfFile());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -182,21 +174,24 @@ public class CreateNetcdf {
 			sensorIndex++;
 		}
 		netcdf.write(sensor, ac2);
-		Variable sensIndex = netcdf.findVariable(SENSOR_INDEX);
 		int sensorIndexArray[] = new int[obsDimension.getLength()];
-		Map<Integer,Map<SensorProperty, Object[]>> propertyList = new HashMap<Integer, 
+		Map<Integer, Map<SensorProperty, Object[]>> propertyList = new HashMap<Integer, 
 				Map<SensorProperty, Object[]>>();
 
 		int rowIndex = 0;
 		List<String> timeRowIndex = new ArrayList<String>();
+		Map<SensorProperty, Object[]> binPropertyMap = 
+				new HashMap<SensorProperty,Object[]>();
 		for(String sensorKey : stationRecord.getSensorIdtoSensorDataMap().keySet()){
 			SensorModel sensorModel = stationRecord.getSensorIdtoSensorDataMap().get(sensorKey);
 			sensorIndex = sensorToIndex.get(sensorKey);
-
+			
 			for(Integer bin : sensorModel.getSensorDataRecord().getTimeSensorDataMap().keySet()){
-				Map<SensorProperty, Object[]> binPropertyMap = new HashMap<SensorProperty,Object[]>();
-				rowIndex = 0;
-
+			
+				if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() > 1){
+					rowIndex = 0;
+					 binPropertyMap = new HashMap<SensorProperty,Object[]>();
+				}
 				List<SensorProperty> sensPropList = sensorModel.getSensorDataRecord().getModeledProperties();
 				int propertyIndex = 0;
 
@@ -209,12 +204,14 @@ public class CreateNetcdf {
 						if(sensProp != null){
 							// get the variable name for each element in the row
 							Variable senPropVar = netcdf.findVariable(sensProp.getPropertyName());
+							
 							if(propertyList.get(bin) == null || propertyList.get(bin).get(sensProp)==null ||
 									propertyList.get(bin).get(sensProp).length < obsDimension.getLength()){
 								// create float array for each property
+								
 								Object[] propArray = new Object[obsDimension.getLength()];
 								binPropertyMap.put(sensProp,  propArray);
-
+							//	sensorPropMap.put(sensorKey, binPropertyMap);
 								//if(propertyList.get(bin) == null)
 								propertyList.put(bin, binPropertyMap);
 
@@ -328,8 +325,8 @@ public class CreateNetcdf {
 
 					}
 				}
-
-			}
+				}
+			
 			if(profileData){
 				for(Variable var : binVarDataMap.keySet()){
 					netcdf.write(var, binVarDataMap.get(var));

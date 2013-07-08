@@ -36,8 +36,10 @@ public class IoosParserTest {
 		 String describeSensNetFile;
 		 String describeSensStatFile;
 		 String outputDirectory;
+		 String timeSeriesOutput;
 		try {
 			outputDirectory = new java.io.File( "./TestOut").getCanonicalPath();
+			timeSeriesOutput = outputDirectory + System.getProperty("file.separator") + "timeSeries";
 			gopFile = new java.io.File( "./TestFiles/OM-GetObservation.xml" ).getCanonicalPath();
 			getCapFile = new java.io.File( "./TestFiles/SOS-GetCapabilities.xml" ).getCanonicalPath();
 			sweRecordFile  = new java.io.File( 
@@ -62,7 +64,7 @@ public class IoosParserTest {
 				 List<MemberObservation> memObs = getObsModel.getMemberObservation();
 				 if(memObs != null){
 					 SweDataRecordParser sweParser; 
-/*
+
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
 					 sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
@@ -94,22 +96,30 @@ public class IoosParserTest {
 					 
 					
 
-				*/
+				
 					 System.out.println("BEGIN GET OBSERVATION - MULTI TIME SERIES ");
 					 sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweMultiRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTIE TIME SERIES ");
-					/* 
-
+					 
+					 CreateNetcdf ncCreate  = new CreateNetcdf(getObsModel);
+						List<NetcdfFile> ncList =  ncCreate.generateNetcdf(timeSeriesOutput);
+						for(NetcdfFile nc : ncList ){
+						
+							System.out.println("NC " +nc.toString());
+						}
+						System.out.println("size " + ncList.size());
+						ncCreate.closeNetcdfFiles();
+						
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
 					 sweParser = new SweDataRecordParser("timeSeriesProfile");
 					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");
-					 */
-					 CreateNetcdf ncCreate  = new CreateNetcdf(getObsModel, null);
-					List<NetcdfFile> ncList =  ncCreate.generateNetcdf(outputDirectory);
+					 
+					ncCreate  = new CreateNetcdf(getObsModel);
+					ncList =  ncCreate.generateNetcdf(outputDirectory);
 					for(NetcdfFile nc : ncList ){
 					
 						System.out.println("NC " +nc.toString());
@@ -120,7 +130,7 @@ public class IoosParserTest {
 
 
 
-		/*		 System.out.println("----BEGIN GET CAPABILITIES");
+				 System.out.println("----BEGIN GET CAPABILITIES");
 				 GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
 				 System.out.println(getCapsModel.toString());
 				 System.out.println("----END GET CAPABILITIES");
@@ -134,7 +144,7 @@ public class IoosParserTest {
 				 DescribeSensorStation sensStat2 = dss.parseDescribeStation(describeSensStatFile);
 				 System.out.println(sensStat2.toString());
 				 System.out.println("----END DESCRIBE SENSOR STATION----");
-*/
+
 			} catch (JDOMException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
