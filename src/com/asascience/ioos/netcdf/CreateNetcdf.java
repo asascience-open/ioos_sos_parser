@@ -182,63 +182,109 @@ public class CreateNetcdf {
 		List<String> timeRowIndex = new ArrayList<String>();
 		Map<SensorProperty, Object[]> binPropertyMap = 
 				new HashMap<SensorProperty,Object[]>();
-		for(String sensorKey : stationRecord.getSensorIdtoSensorDataMap().keySet()){
-			SensorModel sensorModel = stationRecord.getSensorIdtoSensorDataMap().get(sensorKey);
-			sensorIndex = sensorToIndex.get(sensorKey);
-			
-			for(Integer bin : sensorModel.getSensorDataRecord().getTimeSensorDataMap().keySet()){
-			
-				if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() > 1){
-					rowIndex = 0;
-					 binPropertyMap = new HashMap<SensorProperty,Object[]>();
-				}
-				List<SensorProperty> sensPropList = sensorModel.getSensorDataRecord().getModeledProperties();
-				int propertyIndex = 0;
+				List<String> currSensorTimeRowIndex = new ArrayList<String>();
+				Object [] savedTimeData = null;
+				SensorProperty timeProperty = null;
 
-				for(Object[] sensorRow :  
-					sensorModel.getSensorDataRecord().getTimeSensorDataMap().get(bin)){
-					propertyIndex = 0;
-					sensorIndexArray[rowIndex] = sensorIndex;
-					for(Object entry : sensorRow) {
-						SensorProperty sensProp = sensPropList.get(propertyIndex);
-						if(sensProp != null){
+				for(String sensorKey : stationRecord.getSensorIdtoSensorDataMap().keySet()){
+					SensorModel sensorModel = stationRecord.getSensorIdtoSensorDataMap().get(sensorKey);
+					sensorIndex = sensorToIndex.get(sensorKey);
+					currSensorTimeRowIndex.clear();
+					for(Integer bin : sensorModel.getSensorDataRecord().getTimeSensorDataMap().keySet()){
+
+						if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() > 1){
+							if(binPropertyMap != null && timeProperty != null)
+								savedTimeData = binPropertyMap.get(timeProperty);
+							binPropertyMap = new HashMap<SensorProperty,Object[]>();
+							if(savedTimeData != null)
+								binPropertyMap.put(timeProperty, savedTimeData);
+						}
+						List<SensorProperty> sensPropList = sensorModel.getSensorDataRecord().getModeledProperties();
+						int propertyIndex = 0;
+
+						for(Object[] sensorRow :  
+							sensorModel.getSensorDataRecord().getTimeSensorDataMap().get(bin)){
+							propertyIndex = 0;
+							for(Object entry : sensorRow) {
+								SensorProperty sensProp = sensPropList.get(propertyIndex);
+								boolean alreadyCreated = false;
+
+								if(sensProp != null){
+
+									if(propertyList.get(bin) != null) {
+										// check to see if the property was already created
+										for(SensorProperty sensP : propertyList.get(bin).keySet()){
+											if(sensP.getPropertyName().equals(sensProp.getPropertyName())){
+												alreadyCreated = true;
+												sensProp = sensP;
+												break;
+											}
+										}
+
+									}
+									else if(sensProp.getPropertyType() == PropertyType.TIME && timeProperty != null)
+										sensProp = timeProperty;
+									if(propertyList.get(bin) == null || propertyList.get(bin).get(sensProp)==null){
+
+
+										if(!alreadyCreated){
+											Object[] propArray = new Object[obsDimension.getLength()];
+
+											 if(sensProp.getPropertyType() == PropertyType.TIME &&
+														savedTimeData != null && binPropertyMap.get(timeProperty) != null){
+													savedTimeData = null;
+													propertyList.put(bin, binPropertyMap);
+
+												}
+											 else if(propertyList.get(bin) == null){
+												binPropertyMap.put(sensProp,  propArray);
+												propertyList.put(bin, binPropertyMap);
+
+											}
+								
+											else 
+												propertyList.get(bin).put(sensProp, propArray);
+
+											//	sensorPropMap.put(sensorKey, binPropertyMap);
+											//if(propertyList.get(bin) == null)
+
+										}
+									}
+									if(sensProp.getPropertyType() == PropertyType.TIME)
+										timeProperty = sensProp;
+									if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() >1){
+										if(sensProp.getPropertyType() == PropertyType.TIME){
+											if(!currSensorTimeRowIndex.contains(entry))
+												currSensorTimeRowIndex.add((String) entry);
+											rowIndex = timeRowIndex.size() +
+													getIndexForTime(entry.toString(), currSensorTimeRowIndex);
+
+								}
+							}
 							// get the variable name for each element in the row
 							Variable senPropVar = netcdf.findVariable(sensProp.getPropertyName());
-							
-							if(propertyList.get(bin) == null || propertyList.get(bin).get(sensProp)==null ||
-									propertyList.get(bin).get(sensProp).length < obsDimension.getLength()){
-								// create float array for each property
-								
-								Object[] propArray = new Object[obsDimension.getLength()];
-								binPropertyMap.put(sensProp,  propArray);
-							//	sensorPropMap.put(sensorKey, binPropertyMap);
-								//if(propertyList.get(bin) == null)
-								propertyList.put(bin, binPropertyMap);
-
-							}
-							if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() >1){
-								if(sensProp.getPropertyType() == PropertyType.TIME){
-									if(timeRowIndex.contains(entry))
-										rowIndex =  getIndexForTime(entry.toString(), timeRowIndex);
-
-									else
-										timeRowIndex.add((String) entry);
-								}}
 							if(senPropVar != null){
 								propertyList.get(bin).get(sensProp)[rowIndex] = entry;
 							}
 							else
 								propertyList.get(bin).get(sensProp)[rowIndex] = Float.NaN;
+
 						}
+
+					
 						propertyIndex++;
 
 					}
+							sensorIndexArray[rowIndex] = sensorIndex;
+
 					if( sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() == 1)
 						rowIndex++;
 
 				}
 
 			}
+			timeRowIndex.addAll(currSensorTimeRowIndex);
+			
 		}
 		writeObsData(propertyList, sensorIndexArray, netcdf);
 	}
@@ -285,13 +331,7 @@ public class CreateNetcdf {
 							else {
 								ArrayFloat.D2 quantArray;
 								int cur = 0;
-								//								for(float quantEntry : quant){		
-								//									System.out.println(bin + " val  "+quantEntry + " cur "+cur);
-								//									//	if(quantEntry != Float.NaN) 
-								//									quantArray.set(cur,bin, quantEntry);
-								//									
-								//									cur++;
-								//								}
+								
 								if(binVarDataMap.get(var) == null){
 									binVarDataMap.put(var, (new ArrayFloat.D2(
 											obsDimension.getLength(), propertyList.size())));
@@ -358,19 +398,41 @@ public class CreateNetcdf {
 		if(stationRecord != null) {
 			for(String sensorKey : stationRecord.getSensorIdtoSensorDataMap().keySet()){
 				SensorModel sensorModel = stationRecord.getSensorIdtoSensorDataMap().get(sensorKey);
+				List<Object> uniqueTimes = new ArrayList<Object>();
+				List<SensorProperty> sensPropList = sensorModel.getSensorDataRecord().getModeledProperties();
+
 				for(Integer bin : sensorModel.getSensorDataRecord().getTimeSensorDataMap().keySet()){
-					if(sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() >1)
-						numRows++;
+					if(sensorModel.getSensorDataRecord().getTimeSensorDataMap().size() >1) {
+						int propertyIndex = 0;
+						for(Object[] sensorRow :  
+							sensorModel.getSensorDataRecord().getTimeSensorDataMap().get(bin)){
+							propertyIndex = 0;
+							for(Object entry : sensorRow) {
+								SensorProperty sensProp = sensPropList.get(propertyIndex);
+								if(sensProp != null && sensProp.getPropertyType() == PropertyType.TIME){
+
+									if(!uniqueTimes.contains(entry)) {
+										uniqueTimes.add(entry);
+									}
+								}
+								propertyIndex++;
+
+							}
+						}
+					}
 					else {
 						for(Object[] sensorRow :  
 							sensorModel.getSensorDataRecord().getTimeSensorDataMap().get(bin)){
-							numRows++;
+							numRows++; 
 						}
 					}
-
 				}
+				numRows+=uniqueTimes.size();
+
+				
+
 			}
-		}
+			}
 		return numRows;
 	}
 
