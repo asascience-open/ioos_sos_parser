@@ -38,9 +38,9 @@ public class DescribeSensorStationParser  extends BaseParser{
 	private final String classificationTag = "classification";
 	private final String classListTag = "ClassifierList";
 	private final String classifierTag = "classifier";
-	private final String networkIdDef = "http://mmisw.org/ont/ioos/definition/networkID";
-	private final String shortNameDef = "http://mmisw.org/ont/ioos/definition/shortName";
-	private final String longNameDef = "http://mmisw.org/ont/ioos/definition/longName";
+	private final String networkIdDef = "http://mmisw.org/ont/ioos/swe_element_type/networkID";
+	private final String shortNameDef = "http://mmisw.org/ont/ioos/swe_element_type/shortName";
+	private final String longNameDef = "http://mmisw.org/ont/ioos/swe_element_type/longName";
 	private final String capabilitiesTag = "capabilities";
 	private final String contactTag = "contact";
 	private final String contactListTag = "ContactList";
@@ -61,7 +61,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 	private final String postalCodeTag = "postalCode";
 	private final String countryTag = "country";
 	private final String emailTag ="electronicMailAddress";
-	private final String obsTimeRangeDef ="http://mmisw.org/ont/ioos/definition/observationTimeRange";
+	private final String obsTimeRangeDef ="http://mmisw.org/ont/ioos/swe_element_type/observationTimeRange";
 	private final String simpleDataRecordTag = "SimpleDataRecord";
 	private final String textTag = "Text";
 	private final String documentationTag = "documentation";

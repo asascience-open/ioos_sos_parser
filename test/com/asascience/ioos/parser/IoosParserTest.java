@@ -64,7 +64,9 @@ public class IoosParserTest {
 				 List<MemberObservation> memObs = getObsModel.getMemberObservation();
 				 if(memObs != null){
 					 SweDataRecordParser sweParser; 
-
+					 CreateNetcdf ncCreate;
+					 List<NetcdfFile> ncList;
+					 
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
 					 sweParser = new SweDataRecordParser("timeSeries");
 					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
@@ -102,15 +104,15 @@ public class IoosParserTest {
 					 sweParser.parseSweDataRecord(sweMultiRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTIE TIME SERIES ");
-					 
-					 CreateNetcdf ncCreate  = new CreateNetcdf(getObsModel);
-						List<NetcdfFile> ncList =  ncCreate.generateNetcdf(timeSeriesOutput);
-						for(NetcdfFile nc : ncList ){
-						
-							System.out.println("NC " +nc.toString());
-						}
-						System.out.println("size " + ncList.size());
-						ncCreate.closeNetcdfFiles();
+
+					 ncCreate  = new CreateNetcdf(getObsModel);
+					 ncList =  ncCreate.generateNetcdf(timeSeriesOutput);
+					 for(NetcdfFile nc : ncList ){
+
+						 System.out.println("NC " +nc.toString());
+					 }
+					 System.out.println("size " + ncList.size());
+					 ncCreate.closeNetcdfFiles();
 						
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
 					 sweParser = new SweDataRecordParser("timeSeriesProfile");
@@ -128,7 +130,7 @@ public class IoosParserTest {
 					ncCreate.closeNetcdfFiles();
 				 }
 
-
+/*
 
 				 System.out.println("----BEGIN GET CAPABILITIES");
 				 GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
@@ -143,7 +145,7 @@ public class IoosParserTest {
 				 System.out.println("----BEGIN DESCRIBE SENSOR STATION----");
 				 DescribeSensorStation sensStat2 = dss.parseDescribeStation(describeSensStatFile);
 				 System.out.println(sensStat2.toString());
-				 System.out.println("----END DESCRIBE SENSOR STATION----");
+				 System.out.println("----END DESCRIBE SENSOR STATION----");*/
 
 			} catch (JDOMException e) {
 				// TODO Auto-generated catch block

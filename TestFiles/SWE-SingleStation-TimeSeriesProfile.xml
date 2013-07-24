@@ -13,8 +13,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
-  definition="http://mmisw.org/ont/ioos/definition/observationRecord">
-  
+  definition="http://mmisw.org/ont/ioos/swe_element_type/observationRecord">
+ 
   <!-- STATIC DATA -->
   <!-- This field "stations" contains static data for all stations and sensors in the response -->
   <!-- Static data is linked to dynamic data (sensor observation values) via an abbreviated, -->
@@ -29,18 +29,18 @@
   <swe2:field name="stations">
     <!-- IoosTech Convention: -->
     <!-- The data record containing the static data for each station shall be defined -->
-    <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/stations">
+    <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/stations">
       <!-- Static data for the first station, urn:ioos:station:wmo:41001 -->
       <!-- Required elements include for each station: stationID, platformLocation, sensors -->
       <swe2:field name="wmo_41001">
         <!-- IoosTech Convention: -->
         <!-- The data record containing the static data for a station shall be defined -->
-        <swe2:DataRecord id="wmo_41001" 
-          definition="http://mmisw.org/ont/ioos/definition/station">
+        <swe2:DataRecord id="wmo_41001"
+          definition="http://mmisw.org/ont/ioos/swe_element_type/station">
           <swe2:field name="stationID">
             <!-- IoosTech Convention: -->
             <!-- The text element containing the station id shall be defined -->
-            <swe2:Text definition="http://mmisw.org/ont/ioos/definition/stationID">
+            <swe2:Text definition="http://mmisw.org/ont/ioos/swe_element_type/stationID">
               <swe2:value>urn:ioos:station:wmo:41001</swe2:value>
             </swe2:Text>
           </swe2:field>
@@ -97,14 +97,14 @@
           <swe2:field name="sensors">
             <!-- IoosTech Convention: -->
             <!-- The data record containing the static data for each sensor shall be defined -->
-            <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensors">
+            <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensors">
               <swe2:field name="wmo_41001_sensor1">
                 <!-- IoosTech Convention: -->
                 <!-- The data record containing the static data for a sensor shall be defined -->
                 <!-- Reminder: the DataRecord id of a sensor in the static block matches the DataChoice item -->
                 <!-- name in the dynamic block -->
-                <swe2:DataRecord id="wmo_41001_sensor1" 
-                  definition="http://mmisw.org/ont/ioos/definition/sensor">
+                <swe2:DataRecord id="wmo_41001_sensor1"
+                  definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
                   <!-- An example of an acoustic doppler current profiler -->
                   <swe2:field name="sensorID">
                     <!-- Field: sensorID -->
@@ -113,7 +113,7 @@
                     <!-- such as "sensor1", "sensor2", "salt1", etc. -->
                     <!-- IoosTech Convention: -->
                     <!-- The text element containing the sensor id shall be defined -->
-                    <swe2:Text definition="http://mmisw.org/ont/ioos/definition/sensorID">
+                    <swe2:Text definition="http://mmisw.org/ont/ioos/swe_element_type/sensorID">
                       <swe2:value>urn:ioos:sensor:wmo:41001:sensor1</swe2:value>
                     </swe2:Text>
                   </swe2:field>
@@ -154,10 +154,10 @@
                     <!-- actually measured. It is likely that the relative measured location would be dynamic -->
                     <!-- changing with each observation. Where as an absolute lat,lon,Z may be -->
                     <!-- approximated as static. -->
-
+                    <!-- Local frames should always be specified as #{short_asset_id}_frame, regardless of feature type -->
                     <swe2:Vector definition="http://www.opengis.net/def/property/OGC/0/SensorLocation"
                       referenceFrame="http://www.opengis.net/def/crs-compound?1=http://www.opengis.net/def/crs/EPSG/0/4326&amp;2=http://www.opengis.net/def/crs/EPSG/0/5829"
-                      localFrame="#wmo_41001_sensor1_profile_frame">
+                      localFrame="#wmo_41001_sensor1_frame">
                       <swe2:coordinate name="latitude">
                         <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/latitude"
                           axisID="Lat">
@@ -185,7 +185,7 @@
                   <swe2:field name="profileBins">
                     <!-- IoosTech Convention: -->
                     <!-- Static profile bins and depths shall be encoded as an defined array -->
-                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/definition/profileBins">
+                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/swe_element_type/profileBins">
                       <swe2:description>Array of synchronous observation locations in a profile</swe2:description>
                       <swe2:elementCount>
                         <swe2:Count>
@@ -204,7 +204,7 @@
                             <!--       profile_bin? Would be more consistent with normal profiles -->
                             <swe2:Quantity axisID="Z"
                               definition="http://mmisw.org/ont/cf/parameter/height"
-                              referenceFrame="#wmo_41001_sensor1_profile_frame">
+                              referenceFrame="#wmo_41001_sensor1_frame">
                               <swe2:uom code="m" />
                             </swe2:Quantity>
                           </swe2:field>
@@ -212,8 +212,8 @@
                             <!-- IoosTech Convention: -->
                             <!-- binEdges shall be represented by a defined quantity -->
                             <swe2:QuantityRange axisID="Z"
-                              definition="http://mmisw.org/ont/ioos/definition/profileBinEdges"
-                              referenceFrame="#wmo_41001_sensor1_profile_frame">
+                              definition="http://mmisw.org/ont/ioos/swe_element_type/profileBinEdges"
+                              referenceFrame="#wmo_41001_sensor1_frame">
                               <swe2:uom code="m" />
                             </swe2:QuantityRange>
                           </swe2:field>
@@ -245,7 +245,7 @@
                 <!-- Reminder: the DataRecord id of a sensor in the static block matches the DataChoice item -->
                 <!-- name in the dynamic block -->
                 <swe2:DataRecord id="wmo_41001_sensor2"
-                  definition="http://mmisw.org/ont/ioos/definition/sensor">
+                  definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
                   <swe2:field name="sensorID">
                     <!-- IoosTech Convention: -->
                     <!-- The text element containing the sensor id shall be defined -->
@@ -260,10 +260,10 @@
                     <!-- actually measured. It is likely that the relative measured location would be dynamic -->
                     <!-- changing with each observation. Where as an absolute lat,lon,Z may be -->
                     <!-- approximated as static. -->
-
+                    <!-- Local frames should always be specified as #{short_asset_id}_frame, regardless of feature type -->
                     <swe2:Vector definition="http://www.opengis.net/def/property/OGC/0/SensorLocation"
                       referenceFrame="http://www.opengis.net/def/crs-compound?1=http://www.opengis.net/def/crs/EPSG/0/4326&amp;2=http://www.opengis.net/def/crs/EPSG/0/5829"
-                      localFrame="#wmo_41001_sensor2_profile_frame">
+                      localFrame="#wmo_41001_sensor2_frame">
                       <swe2:coordinate name="latitude">
                         <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/latitude"
                           axisID="Lat">
@@ -292,7 +292,7 @@
                     <!-- IoosTech Convention: -->
                     <!-- Static profile bins and heights shall be encoded as an defined array -->
                     <swe2:DataArray
-                      definition="http://mmisw.org/ont/ioos/definition/profileHeights">
+                      definition="http://mmisw.org/ont/ioos/swe_element_type/profileHeights">
                       <swe2:elementCount>
                         <swe2:Count>
                           <swe2:value>3</swe2:value>
@@ -307,7 +307,7 @@
                             <!-- Profile depth shall be represented by a defined quantity -->
                             <swe2:Quantity axisID="Z"
                               definition="http://mmisw.org/ont/cf/parameter/height"
-                              referenceFrame="#wmo_41001_sensor2_profile_frame">
+                              referenceFrame="#wmo_41001_sensor2_frame">
                               <swe2:uom code="m" />
                             </swe2:Quantity>
                           </swe2:field>
@@ -319,10 +319,10 @@
                           tokenSeparator=","
                           blockSeparator="&#10;" />
                       </swe2:encoding>
-                      <swe2:values> 
-                        -5.0 
-                        -10.0 
-                        -20.0 
+                      <swe2:values>
+                        -5.0
+                        -10.0
+                        -20.0
                       </swe2:values>
                     </swe2:DataArray>
                   </swe2:field>
@@ -342,7 +342,7 @@
   <swe2:field name="observationData">
     <!-- IoosTech Convention: -->
     <!-- The field containing the dynamic data from each sensor shall contain a DataArray defined as such-->
-    <swe2:DataArray definition="http://mmisw.org/ont/ioos/definition/sensorObservationCollection">
+    <swe2:DataArray definition="http://mmisw.org/ont/ioos/swe_element_type/sensorObservationCollection">
       <!-- Count of records in swe:values -->
       <swe2:elementCount>
         <swe2:Count>
@@ -353,7 +353,7 @@
       <swe2:elementType name="observations">
         <!-- IoosTech Convention: -->
         <!-- The data record containing the dynamic observation descriptors for each sensor shall be defined -->
-        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensorObservations">
+        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensorObservations">
           <!-- Time is included for all sensors so it is listed first and is outside of DataChoice. -->
           <!-- If time is defined differently for some sensors it could be moved inside the data -->
           <!-- but this is uncommon. -->
@@ -369,17 +369,17 @@
           <swe2:field name="sensor">
             <!-- IoosTech Convention: -->
             <!-- The data array shall contain one field with a DataChoice defined as sensor records -->
-            <swe2:DataChoice definition="http://mmisw.org/ont/ioos/definition/sensors">
+            <swe2:DataChoice definition="http://mmisw.org/ont/ioos/swe_element_type/sensors">
               <!-- DataChoice for wmo 41001's sensor1 -->
               <!-- Dynamic sensor observations are linked to static data using the DataChoice -->
               <!-- item name: wmo_41001_sensor1 -->
               <swe2:item name="wmo_41001_sensor1">
                 <!-- IoosTech Convention: -->
                 <!-- The data record containing the dynamic observation descriptors for a sensor shall be defined -->
-                <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensor">
-                  
+                <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
+                 
                   <swe2:field name="adcpProfile">
-                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/definition/profile">
+                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/swe_element_type/profile">
                       <swe2:description>Array of synchronous observations in a Profile</swe2:description>
                       <swe2:elementCount>
                         <!-- IoosTech Convention: -->
@@ -388,7 +388,7 @@
                         <swe2:Count />
                       </swe2:elementCount>
                       <swe2:elementType name="profileObservation">
-                        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/profileObservation">
+                        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/profileObservation">
 
                           <swe2:field name="profileIndex">
                             <!-- IoosTech Convention: -->
@@ -397,7 +397,7 @@
                             <!-- allowing ragged arrays -->
                             <!-- NOTE: http://www.opengis.net/def/property/OGC/0/ArrayIndex is mentioned -->
                             <!--       in the SWE 2.0 spec but doesn't resolve... -->
-                            <swe2:Count definition="http://mmisw.org/ont/ioos/definition/profileIndex">
+                            <swe2:Count definition="http://mmisw.org/ont/ioos/swe_element_type/profileIndex">
                               <swe2:constraint>
                                 <swe2:AllowedValues>
                                   <swe2:interval>0 4</swe2:interval>
@@ -405,19 +405,19 @@
                               </swe2:constraint>
                             </swe2:Count>
                           </swe2:field>
-                          
+                         
                           <swe2:field name="direction_of_sea_water_velocity">
                             <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/direction_of_sea_water_velocity">
                               <swe2:uom code="deg" />
                             </swe2:Quantity>
                           </swe2:field>
-                          
+                         
                           <swe2:field name="sea_water_speed">
                             <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/sea_water_speed">
                               <swe2:uom code="cm/s" />
                             </swe2:Quantity>
                           </swe2:field>
-                          
+                         
                         </swe2:DataRecord>
                       </swe2:elementType>
                     </swe2:DataArray>
@@ -426,9 +426,9 @@
               </swe2:item>
 
               <swe2:item name="wmo_41001_sensor2">
-                <swe2:DataRecord>
+                <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
                   <swe2:field name="thermisterProfile">
-                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/definition/profile">
+                    <swe2:DataArray definition="http://mmisw.org/ont/ioos/swe_element_type/profile">
                       <swe2:elementCount>
                         <!-- IoosTech Convention: -->
                         <!-- Count value is always omitted here and included inline with the encoded -->
@@ -436,15 +436,14 @@
                         <swe2:Count />
                       </swe2:elementCount>
                       <swe2:elementType name="profileObservation">
-                        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/profile
-                        Observation">
-                          
+                        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/profileObservation">
+                         
                           <swe2:field name="binIndex">
                             <!-- IoosTech Convention: -->
                             <!-- A count element, constrained by the maximum dimension of the array -->
                             <!-- shall specify which zero-based bin index the data applies to, -->
                             <!-- allowing ragged arrays -->
-                            <swe2:Count definition="http://mmisw.org/ont/ioos/definition/profileIndex">
+                            <swe2:Count definition="http://mmisw.org/ont/ioos/swe_element_type/profileIndex">
                               <swe2:constraint>
                                 <swe2:AllowedValues>
                                   <swe2:interval>0 2</swe2:interval>
@@ -452,13 +451,13 @@
                               </swe2:constraint>
                             </swe2:Count>
                           </swe2:field>
-                            
+                           
                           <swe2:field name="sea_water_temperature">
                             <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/sea_water_temperature">
                               <swe2:uom code="Cel" />
                             </swe2:Quantity>
                           </swe2:field>
-                          
+                         
                         </swe2:DataRecord>
                       </swe2:elementType>
                     </swe2:DataArray>
@@ -498,7 +497,7 @@
           tokenSeparator=","
           blockSeparator="&#10;" />
       </swe2:encoding>
-      <swe2:values> 
+      <swe2:values>
         2009-05-23T00:00:00Z,wmo_41001_sensor1,2,0,359.0,10.0,3,352.0,9.6
         2009-05-23T01:00:00Z,wmo_41001_sensor1,1,2,345.0,10.4
         2009-05-23T02:00:00Z,wmo_41001_sensor1,4,0,332.0,10.5,1,334.0,10.3,2,336.0,10.1,3,335.0,9.9
@@ -509,4 +508,3 @@
     </swe2:DataArray>
   </swe2:field>
 </swe2:DataRecord>
-

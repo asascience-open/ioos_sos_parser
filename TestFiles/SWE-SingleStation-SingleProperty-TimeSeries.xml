@@ -16,8 +16,8 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.opengis.net/swe/2.0 http://schemas.opengis.net/sweCommon/2.0/swe.xsd"
-  definition="http://mmisw.org/ont/ioos/definition/observationRecord">
-  
+  definition="http://mmisw.org/ont/ioos/swe_element_type/observationRecord">
+ 
   <!-- STATIC DATA -->
   <!-- This field "stations" contains static data for all stations and sensors in the response -->
   <!-- Static data is linked to dynamic data (sensor observation values) via an abbreviated, -->
@@ -32,14 +32,14 @@
   <swe2:field name="stations">
     <!-- IoosTech Convention: -->
     <!-- The data record containing the static data for each station shall be defined -->
-    <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/stations">
+    <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/stations">
       <!-- Static data for the first station, urn:ioos:station:wmo:41001 -->
       <!-- Required elements include for each station: stationID, platformLocation, sensors -->
-      <swe2:field name="wmo_41001"> 
+      <swe2:field name="wmo_41001">
         <!-- IoosTech Convention: -->
         <!-- The data record containing the static data for a station shall be defined -->
-        <swe2:DataRecord id="wmo_41001" 
-          definition="http://mmisw.org/ont/ioos/definition/station">
+        <swe2:DataRecord id="wmo_41001"
+          definition="http://mmisw.org/ont/ioos/swe_element_type/station">
           <swe2:field name="stationID">
             <!-- IoosTech Convention: -->
             <!-- The text element containing the station id shall be defined -->
@@ -97,14 +97,14 @@
           <swe2:field name="sensors">
             <!-- IoosTech Convention: -->
             <!-- The data record containing the static data for each sensor shall be defined -->
-            <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensors">
+            <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensors">
               <swe2:field name="wmo_41001_sensor1">
                 <!-- IoosTech Convention: -->
                 <!-- The data record containing the static data for a sensor shall be defined -->
                 <!-- Reminder: the DataRecord id of a sensor in the static block matches the DataChoice item -->
                 <!-- name in the dynamic block -->
-                <swe2:DataRecord id="wmo_41001_sensor1" 
-                  definition="http://mmisw.org/ont/ioos/definition/sensor">
+                <swe2:DataRecord id="wmo_41001_sensor1"
+                  definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
                   <swe2:field name="sensorID">
                     <!-- Field: sensorID -->
                     <!-- The sensorID urn may use a meaningful "component" name (eg, "sbe16"); or, -->
@@ -146,7 +146,7 @@
   <swe2:field name="observationData">
     <!-- IoosTech Convention: -->
     <!-- The field containing the dynamic data from each sensor shall contain a DataArray defined as such-->
-    <swe2:DataArray definition="http://mmisw.org/ont/ioos/definition/sensorObservationCollection">
+    <swe2:DataArray definition="http://mmisw.org/ont/ioos/swe_element_type/sensorObservationCollection">
       <!-- Count of records in swe:values -->
       <swe2:elementCount>
         <swe2:Count>
@@ -157,7 +157,7 @@
       <swe2:elementType name="observations">
         <!-- IoosTech Convention: -->
         <!-- The data record containing the dynamic observation descriptors for each sensor shall be defined -->
-        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensorObservations">
+        <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensorObservations">
           <!-- Time is included for all sensor so it is listed first and is outside of DataChoice. -->
           <!-- If time is defined differently for some sensors it could be moved inside the data -->
           <!-- but this is uncommon. -->
@@ -173,14 +173,14 @@
           <swe2:field name="sensor">
             <!-- IoosTech Convention: -->
             <!-- The data array shall contain one field with a DataChoice defined as sensor records -->
-            <swe2:DataChoice definition="http://mmisw.org/ont/ioos/definition/sensors">
+            <swe2:DataChoice definition="http://mmisw.org/ont/ioos/swe_element_type/sensors">
               <!-- DataChoice for wmo 41001's sensor1 -->
               <!-- Dynamic sensor observations are linked to static data using the DataChoice -->
               <!-- item name: wmo_41001_sensor1 -->
               <swe2:item name="wmo_41001_sensor1">
                 <!-- IoosTech Convention: -->
                 <!-- The data record containing the dynamic observation descriptors for a sensor shall be defined -->
-                <swe2:DataRecord definition="http://mmisw.org/ont/ioos/definition/sensor">
+                <swe2:DataRecord definition="http://mmisw.org/ont/ioos/swe_element_type/sensor">
                   <!-- wmo_41001_sensor1's observed properties -->
                   <swe2:field name="air_temperature">
                     <swe2:Quantity definition="http://mmisw.org/ont/cf/parameter/air_temperature">
@@ -205,12 +205,12 @@
               <swe2:item name="dummy_item"/>
               <!-- Since DataChoice must contain 2 or more items add a dummy item which is never -->
               <!-- Used in the actual encoding block. We view this as a mistake in the SWE specification -->
-                
+               
             </swe2:DataChoice>
           </swe2:field>
         </swe2:DataRecord>
-      </swe2:elementType>       
-      
+      </swe2:elementType>      
+     
       <swe2:encoding>
         <!-- SWE encoding and data values -->
         <!-- IoosTech Convention: -->

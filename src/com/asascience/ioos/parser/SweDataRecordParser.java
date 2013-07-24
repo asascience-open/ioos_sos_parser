@@ -62,24 +62,24 @@ public class SweDataRecordParser extends BaseParser {
 	private final String constraintTag =  "constraint";
 	private final String allowedTokenTag = "AllowedTokens";
 	private final String timeTag = "Time";
-	private final String stationsStaticDataDef = "http://mmisw.org/ont/ioos/definition/stations";
-	private final String stationShortIdDefinition = "http://mmisw.org/ont/ioos/definition/station";
-	private final String stationIdDefinition ="http://mmisw.org/ont/ioos/definition/stationID";
+	private final String stationsStaticDataDef = "http://mmisw.org/ont/ioos/swe_element_type/stations";
+	private final String stationShortIdDefinition = "http://mmisw.org/ont/ioos/swe_element_type/station";
+	private final String stationIdDefinition ="http://mmisw.org/ont/ioos/swe_element_type/stationID";
 	private final String latitudeCoordDefinition = "http://mmisw.org/ont/cf/parameter/latitude";
 	private final String longitudeCoordDefinition = "http://mmisw.org/ont/cf/parameter/longitude";
 	private final String zCoodDefinition = "http://mmisw.org/ont/cf/parameter/height";
-	private final String sensorObsCollectionDynDataDef = "http://mmisw.org/ont/ioos/definition/sensorObservationCollection";
-	private final String sensorObservationDefiniton = "http://mmisw.org/ont/ioos/definition/sensorObservations";
-	private final String sensorDefinition = "http://mmisw.org/ont/ioos/definition/sensor";
-	private final String sensorListDefintion = "http://mmisw.org/ont/ioos/definition/sensors";
-	private final String sensorIdDefintion = "http://mmisw.org/ont/ioos/definition/sensorID";
+	private final String sensorObsCollectionDynDataDef = "http://mmisw.org/ont/ioos/swe_element_type/sensorObservationCollection";
+	private final String sensorObservationDefiniton = "http://mmisw.org/ont/ioos/swe_element_type/sensorObservations";
+	private final String sensorDefinition = "http://mmisw.org/ont/ioos/swe_element_type/sensor";
+	private final String sensorListDefintion = "http://mmisw.org/ont/ioos/swe_element_type/sensors";
+	private final String sensorIdDefintion = "http://mmisw.org/ont/ioos/swe_element_type/sensorID";
 	private final String sensorOrientationDefinition = "http://www.opengis.net/def/property/OGC/0/SensorOrientation";
 	private final String sensorLocationDefinition = "http://www.opengis.net/def/property/OGC/0/SensorLocation";
 	private final String samplingTimeDefinition = "http://www.opengis.net/def/property/OGC/0/SamplingTime";
-	private final String profileHeightDefinition = "http://mmisw.org/ont/ioos/definition/profileHeights";
+	private final String profileHeightDefinition = "http://mmisw.org/ont/ioos/swe_element_type/profileHeights";
 	private final String platformLocationDef ="http://www.opengis.net/def/property/OGC/0/PlatformLocation";
 	private final String heightDefinition="http://mmisw.org/ont/cf/parameter/height";
-	private final String profileBinsDefinition="http://mmisw.org/ont/ioos/definition/profileBins";
+	private final String profileBinsDefinition="http://mmisw.org/ont/ioos/swe_element_type/profileBins";
 	
 	
 	public SweDataRecordParser(String sweFileTypeStr){
