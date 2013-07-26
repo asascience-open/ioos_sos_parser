@@ -130,7 +130,7 @@ public class IoosParserTest {
 					ncCreate.closeNetcdfFiles();
 				 }
 
-/*
+
 
 				 System.out.println("----BEGIN GET CAPABILITIES");
 				 GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
@@ -145,7 +145,7 @@ public class IoosParserTest {
 				 System.out.println("----BEGIN DESCRIBE SENSOR STATION----");
 				 DescribeSensorStation sensStat2 = dss.parseDescribeStation(describeSensStatFile);
 				 System.out.println(sensStat2.toString());
-				 System.out.println("----END DESCRIBE SENSOR STATION----");*/
+				 System.out.println("----END DESCRIBE SENSOR STATION----");
 
 			} catch (JDOMException e) {
 				// TODO Auto-generated catch block

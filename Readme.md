@@ -1,4 +1,4 @@
-# IOOS SWE SOS Parseing Library 
+# IOOS SWE SOS Parsing Library 
 ===================
 
 A XML Parser library for Sensor Web Enablement (SWE) Common Data Model (CDM)
@@ -20,16 +20,29 @@ this parser parse the following data services into the data model:
 
 ## Common Interface
 
-### Create parser Service
-
+### Create Parser Service
+The ioos_sos_parser can be used to parse getCapabilities, DescribeSensor and GetObservation requests. The
+parser can be instantiated with the following calls:
 ```java 
 GetObservationParser gop = new GetObservationParser();
 GetCapabilitiesParser gc = new GetCapabilitiesParser();
 DescribeSensorStationParser dss = new DescribeSensorStationParser();
 ```
 ### Obtain Data Model
+Once the parser is instantiated the data model can be obtained by calling one of the following functions:
 ```java
 GetObservation getObsModel = gop.parseGO(gopFile);
+DescribeSensorStation describeSensorModel = dss.parseDescribeStation(describeSensStatFile);
+GetCapabilities getCapsModel = gc.parseGetCapabilities(getCapFile);
+```
+The parsing functions can accept either the path to a file that contains the XML to parse or a URL.
+
+### Create Netcdf File
+Netcdf files can be created from the GetObservation data model. One Netcdf file will be created for each different station in the GetObservation data model. 
+The following function call will create the Netcdf files in the specified output directory and will return a list of Netcdfile objects.
+```java
+ CreateNetcdf ncCreate  = new CreateNetcdf(getObsModel);
+ List<NetcdfFile> ncList =  ncCreate.generateNetcdf(outputDirectory);
 ```
 
 ## Maven Repo
