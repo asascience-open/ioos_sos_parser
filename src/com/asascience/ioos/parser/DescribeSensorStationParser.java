@@ -165,10 +165,7 @@ public class DescribeSensorStationParser  extends BaseParser{
 			}
 		}
 		}
-//		if(!foundNetworkId || !foundShortName || !foundLongName){
-//			System.out.println(foundNetworkId + " " + foundShortName + " " + foundLongName);
-//			throw new IoosSosParserException(IoosSosParserErrors.IDENTIFIER_MISSING);
-//		}
+
 		return idMap;
 	}
 	

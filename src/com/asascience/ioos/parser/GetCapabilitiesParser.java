@@ -358,7 +358,16 @@ public class GetCapabilitiesParser extends BaseParser {
 					content.getChild(this.observationOfferingListTag, sosNs)));
 		
 	}
-	
+	public GetCapabilities parseGetCapabilities(Document xmlDoc){
+		GetCapabilities getCap = new GetCapabilities();
+		try {
+			parseGetCapabilities(xmlDoc, getCap);
+		} catch (IoosSosParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return getCap;
+	}
 	public GetCapabilities parseGetCapabilities(String xmlFileName) 
 			throws JDOMException, IOException, IoosSosParserException{
 		File xmlFile = new File(xmlFileName);

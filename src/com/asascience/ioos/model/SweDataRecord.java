@@ -51,9 +51,7 @@ public class SweDataRecord {
 
 
 	public void addStationIdMap(String shortIDKey, String stationIdKey){
-		System.out.println("adding "+shortIDKey + " " +stationIdKey);
 		stationIdMap.put(shortIDKey, stationIdKey);
-		System.out.println(stationIdMap.size());
 	}
 
 	public Map<String, String> getStationIdMap() {

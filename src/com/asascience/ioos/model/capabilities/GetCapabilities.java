@@ -125,16 +125,12 @@ public class GetCapabilities {
 	public Operation getOperation(String operationName){
 		Operation op = null;
 		for(Operation tempOp : this.operationsList){
-			System.out.println(tempOp.operationName);
 			if(operationName.equals(tempOp.getOperationName())){
 				op = tempOp;
 				break;
 			}
 		}
-		if(op != null)
-		System.out.println("returning "+op.toString());
-		else
-			System.out.println(operationsList.size());
+		
 		return op;
 	}
 	

@@ -527,11 +527,15 @@ public class CreateNetcdf {
 											DataType.CHAR, timeDims);
 
 								}
-								Attribute unitMeasure = new Attribute(UNITS, modeledProp.getSensorUnitOfMeasure());
-								Attribute longName = new Attribute(LONG_NAME, modeledProp.getSensorType());
-								ncFile.addVariableAttribute(propVar, unitMeasure);
-								ncFile.addVariableAttribute(propVar, longName);
+								if(modeledProp.getSensorUnitOfMeasure() != null){
+									Attribute unitMeasure = new Attribute(UNITS, modeledProp.getSensorUnitOfMeasure());
+									ncFile.addVariableAttribute(propVar, unitMeasure);
 
+								}
+								if(modeledProp.getSensorType() != null){
+									Attribute longName = new Attribute(LONG_NAME, modeledProp.getSensorType());
+									ncFile.addVariableAttribute(propVar, longName);
+								}
 							}
 						}
 					}

@@ -538,36 +538,27 @@ public class SweDataRecordParser extends BaseParser {
 											  String tokenSep, String blockSep, SweFileType parseFileType)
 													  throws NumberFormatException{
 
-	System.out.println("CALLED DYN VALUE -----------------");
 		if(valuesElem != null){
 			int timeColumn = sweRecord.getTimeColumn();
 			int sensorStartColumn = sweRecord.getSectorStartColumn();
 			String valueBlock = valuesElem.getValue();
 			String[] rowBlock = valueBlock.split(blockSep);
-			System.out.println("TEST DEBUG");
 			for(String row : rowBlock) {
 				String [] rowColumnVals = row.trim().split(tokenSep);
-				System.out.println("time column " + timeColumn + "sensor start" + sensorStartColumn 
-						+ " len" +rowColumnVals.length);
+			
 				if(timeColumn < rowColumnVals.length && 
 						sensorStartColumn < rowColumnVals.length){
 					String sensorId = rowColumnVals[sensorStartColumn];
-					System.out.println("looking for sensor " +sensorId);
 					StationModel station =  sweRecord.findStationWithSensor(sensorId);
 					if(station == null) continue;
-					System.out.println("station is not null");
 					SensorModel sensorModel = station.getSensorIdtoSensorDataMap().get(sensorId);
 			
 					if(sensorModel != null) {
 						SensorDataRecords sensorRec = sensorModel.getSensorDataRecord(); 
-						System.out.println("get sensor model ");
 						if(sensorRec != null ){
-							System.out.println("Not null");
 							if(parseFileType == SweFileType.TIME_SERIES) {
 								Object[] sensorData = new Object[sensorRec.getNumberProperties()];
-								System.out.println("********debug for " + sensorModel.getSensorId());
-								for(SensorProperty sP :sensorRec.getModeledProperties() )
-									System.out.println(sP.getSensorType());
+							
 								// verify that the number of columns for this entry is 1 greater than
 								// the number of properties (the sensor id is also a column)
 								if(rowColumnVals.length == sensorData.length + 1) {
@@ -593,11 +584,7 @@ public class SweDataRecordParser extends BaseParser {
 						}
 						else {
 							
-							
-//							System.out.println("start debug " + sensorModel.getSensorId());
-//							for(SensorProperty pro:sensorModel.getSensorDataRecord().getModeledProperties())
-//							System.out.println("pro "+ pro.getPropertyType());
-//							System.out.println("end debug");
+
 								int objectIndex = 0;
 								Integer countIndex = sensorRec.getPropertyIndex(PropertyType.COUNT);
 								
@@ -841,20 +828,12 @@ public class SweDataRecordParser extends BaseParser {
 	private List<SensorProperty> getColumnsFromDataRecordElem(Element dataRecord){
 		List<SensorProperty> sensorProperty = new ArrayList<SensorProperty>();
 		for(Element sensorField : dataRecord.getChildren(fieldTag, swe2Ns)){
-//			if(sensorField.getChild(elementCountTag, swe2Ns) != null){
-//				System.out.println("found COUNT Tag");
-//				SensorProperty sensorData = new SensorProperty();
-//				sensorData.setPropertyType(PropertyType.COUNT);
-//				sensorProperty.add(sensorData);
-//			}
-//			else
+
 				sensorProperty.addAll(determineDataColumnFields(sensorField));
 			
 
 		}
-//		System.out.println("PROP - "+ sensorProperty.size() );
-//		for(SensorProperty prop : sensorProperty)
-//			System.out.println(prop.getPropertyType().toString());
+
 		return sensorProperty;
 	}
 	

@@ -97,7 +97,6 @@ public class SensorModel {
 	}
 
 	public void setSensorDataRecord(SensorDataRecords sensorDataRecord) {
-		System.out.println("set sensordata record");
 		this.sensorDataRecord = sensorDataRecord;
 	}
 
