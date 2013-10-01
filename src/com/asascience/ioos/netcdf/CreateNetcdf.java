@@ -319,7 +319,7 @@ public class CreateNetcdf {
 							int quantIndex = 0;
 							for(Object quantOb : propToWrite) {
 								if(quantOb != null)
-									quant[quantIndex] = (float) ((double)quantOb);
+									quant[quantIndex] = (float)((double) ((Double)quantOb));
 								//else quant[quantIndex] = Float.NaN;
 								quantIndex++;
 							}

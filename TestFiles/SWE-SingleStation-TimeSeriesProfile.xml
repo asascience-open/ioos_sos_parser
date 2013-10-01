@@ -40,7 +40,7 @@
           <swe2:field name="stationID">
             <!-- IoosTech Convention: -->
             <!-- The text element containing the station id shall be defined -->
-            <swe2:Text definition="http://mmisw.org/ont/ioos/swe_element_type/stationID">
+            <swe2:Text definition="http://mmisw.org/ont/ioos/definition/stationID">
               <swe2:value>urn:ioos:station:wmo:41001</swe2:value>
             </swe2:Text>
           </swe2:field>
@@ -113,7 +113,7 @@
                     <!-- such as "sensor1", "sensor2", "salt1", etc. -->
                     <!-- IoosTech Convention: -->
                     <!-- The text element containing the sensor id shall be defined -->
-                    <swe2:Text definition="http://mmisw.org/ont/ioos/swe_element_type/sensorID">
+                    <swe2:Text definition="http://mmisw.org/ont/ioos/definition/sensorID">
                       <swe2:value>urn:ioos:sensor:wmo:41001:sensor1</swe2:value>
                     </swe2:Text>
                   </swe2:field>

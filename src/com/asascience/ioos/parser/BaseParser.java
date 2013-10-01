@@ -73,35 +73,29 @@ public class BaseParser {
 	// initialize the getObservation namespaces
 	protected void initNamespaces(Element root){
 		for(Namespace ns : root.getAdditionalNamespaces()){
-			switch(ns.getPrefix()){
-			case omNsTag:
+		
+			
+			if(ns.getPrefix().equals(omNsTag))
 				omNs = ns;
-				break;
-			case gmlNsTag:
+			
+			else if (ns.getPrefix().equals(gmlNsTag))
 				gmlNs = ns;
-				break;
-			case sweNsTag:
+				
+			else if (ns.getPrefix().equals(sweNsTag))
 				sweNs = ns;
-				break;
-			case xlinkNsTag:
+			else if (ns.getPrefix().equals(xlinkNsTag))
 				xlinkNs = ns;
-				break;
-			case swe2NsTag:
+			else if (ns.getPrefix().equals(swe2NsTag))
 				swe2Ns = ns;
-				break;
-			case sosNsTag:
+			else if (ns.getPrefix().equals( sosNsTag))
 				sosNs = ns;
-				break;
-			case owsNsTag:
+			else if (ns.getPrefix().equals(owsNsTag))
 				owsNs = ns;
-				break;
-			case xsiNsTag:
+			else if (ns.getPrefix().equals(xsiNsTag))
 				xsiNs = ns;
-				break;
-			case smlNsTag:
+			else if (ns.getPrefix().equals(smlNsTag))
 				smlNs = ns;
-				break;
-			}
+			
 		}
 		
 	}
@@ -137,29 +131,21 @@ public class BaseParser {
 			for(Element childElem : contactElem.getChildren()){
 				for(Element dataElem : childElem.getChildren()){
 					String dataText = dataElem.getText();
-					switch(dataElem.getName()){
-					case voiceTag:
+					if(dataElem.getName().equals(voiceTag))
 						address.setContactPhone(dataText);
-						break;
-					case deliveryPointTag:
+					else if(dataElem.getName().equals(deliveryPointTag))
 						address.setAddressDeliveryPoint(dataText);
-						break;
-					case cityTag:
+					else if(dataElem.getName().equals(cityTag))
 						address.setAddressCity(dataText);
-						break;
-					case administrativeAreaTag:
+					else if(dataElem.getName().equals(administrativeAreaTag))
 						address.setAddressAdminArea(dataText);
-						break;
-					case postalCodeTag:
+					else if(dataElem.getName().equals(postalCodeTag))
 						address.setAddressZipCode(dataText);
-						break;
-					case countryTag:
+					else if(dataElem.getName().equals(countryTag))
 						address.setAddressCountry(dataText);
-						break;
-					case emailTag:
+					else if(dataElem.getName().equals(emailTag))
 						address.setContactEmail(dataText);
-						break;
-					}
+					
 				}
 			}
 		}

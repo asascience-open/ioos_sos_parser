@@ -38,9 +38,9 @@ public class DescribeSensorStationParser  extends BaseParser{
 	private final String classificationTag = "classification";
 	private final String classListTag = "ClassifierList";
 	private final String classifierTag = "classifier";
-	private final String networkIdDef = "http://mmisw.org/ont/ioos/swe_element_type/networkID";
-	private final String shortNameDef = "http://mmisw.org/ont/ioos/swe_element_type/shortName";
-	private final String longNameDef = "http://mmisw.org/ont/ioos/swe_element_type/longName";
+	private final String networkIdDef = "http://mmisw.org/ont/ioos/definition/networkID";
+	private final String shortNameDef = "http://mmisw.org/ont/ioos/definition/shortName";
+	private final String longNameDef = "http://mmisw.org/ont/ioos/definition/longName";
 	private final String capabilitiesTag = "capabilities";
 	private final String contactTag = "contact";
 	private final String contactListTag = "ContactList";
@@ -149,17 +149,13 @@ public class DescribeSensorStationParser  extends BaseParser{
 					desc.setName(id.getAttributeValue(nameTag));
 					desc.setValue( term.getChildText(valueTag, smlNs));
 					idMap.put(def,  desc);
-					switch(def){
-					case networkIdDef:
+					if(def.equals(networkIdDef))
 						foundNetworkId = true;
-						break;
-					case shortNameDef:
+					else if(def.equals(shortNameDef))
 						foundShortName = true;
-						break;
-					case longNameDef:
-						foundLongName = true;
-						break;
-					}
+						
+					else if(def.equals(longNameDef))
+						foundLongName = true;					
 				}
 				
 			}
@@ -277,27 +273,21 @@ public class DescribeSensorStationParser  extends BaseParser{
 		if(dataElem != null){
 			for(Element childElem : dataElem.getChildren()){
 			String dataText = childElem.getText();
-			switch(childElem.getName()){
 	
-			case deliveryPointTag:
+			if(childElem.getName().equals(deliveryPointTag))
 				address.setAddressDeliveryPoint(dataText);
-				break;
-			case cityTag:
+			else if(childElem.getName().equals(cityTag))
 				address.setAddressCity(dataText);
-				break;
-			case administrativeAreaTag:
+			else if(childElem.getName().equals(administrativeAreaTag))
 				address.setAddressAdminArea(dataText);
-				break;
-			case postalCodeTag:
+			else if(childElem.getName().equals(postalCodeTag))
 				address.setAddressZipCode(dataText);
-				break;
-			case countryTag:
+				
+			else if(childElem.getName().equals(countryTag))
 				address.setAddressCountry(dataText);
-				break;
-			case emailTag:
+			else if(childElem.getName().equals(emailTag))
 				address.setContactEmail(dataText);
-				break;
-			}
+			
 			}
 		}
 		return address;

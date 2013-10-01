@@ -74,14 +74,12 @@ public class GetCapabilitiesParser extends BaseParser {
 
 		if(serviceProvider != null){
 			for(Element providerElem : serviceProvider.getChildren()){
-				switch(providerElem.getName()){
 
-				case providerNameTag:
+				if(providerElem.getName().equals(providerNameTag))
 					provider.setContactName(providerElem.getText());
-					break;
-				case providerSiteTag:
+				else if(providerElem.getName().equals(providerSiteTag))
 					provider.setProviderUrl(providerElem.getAttributeValue(xlinkAttributeHrefTag, xlinkNs));
-				case serviceContactTag:
+				else if(providerElem.getName().equals(serviceContactTag))
 					for(Element contactElem : providerElem.getChildren()){
 						if(contactElem.getName().equals(individualNameTag)){
 							provider.setContactName(contactElem.getText());
@@ -92,7 +90,7 @@ public class GetCapabilitiesParser extends BaseParser {
 							
 						}
 					}
-				}
+				
 			}
 		}
 		return provider;
@@ -106,33 +104,25 @@ public class GetCapabilitiesParser extends BaseParser {
 		ServiceIdentification serviceId = new ServiceIdentification();
 		if(serviceElem != null){
 			for(Element serviceElemChild : serviceElem.getChildren()){
-				switch (serviceElemChild.getName()){
-				case titleTag:
+				if(serviceElemChild.getName().equals(titleTag))
 					serviceId.setTitle(serviceElemChild.getText());
-					break;
-				case abstractTag:
+				else if(serviceElemChild.getName().equals(abstractTag))
 					serviceId.setAbstractOfService(serviceElemChild.getText());
-					break;
-				case keywordsTag:
+				else if(serviceElemChild.getName().equals(keywordsTag))
 					for(Element keyElem : serviceElemChild.getChildren(keywordTag, owsNs)){
 						if(keyElem.getText() != null)
 							serviceId.getKeywordList().add(keyElem.getText());
 					}
-					break;
-				case serviceTypeTag:
+				else if(serviceElemChild.getName().equals(serviceTypeTag))
 					serviceId.setServiceType(serviceElemChild.getText());
-					break;
 				
-				case serviceTypeVersionTag:
+				else if(serviceElemChild.getName().equals(serviceTypeVersionTag))
 					serviceId.setServiceTypeVersion(serviceElemChild.getText());
-					break;
-				case feeTag:
+				else if(serviceElemChild.getName().equals(feeTag))
 					serviceId.setFeesForService(serviceElemChild.getText());
-					break;
-				case accessConstraintsTag:
+				else if(serviceElemChild.getName().equals(accessConstraintsTag))
 					serviceId.setAccessConstraints(serviceElemChild.getText());
-					break;
-				}
+				
 				
 				
 			}
@@ -311,9 +301,13 @@ public class GetCapabilitiesParser extends BaseParser {
 			parseOperationsMetadata(root.getChild(operationsMetadataTag, owsNs), getCap);
 			if(getCap != null && version1_0.equals(getCap.getVersion()))
 				isGetCapVers1 = true;
-		} catch (JDOMException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JDOMException e1) {
+			e1.printStackTrace();
+
+		}
+		catch(IOException e2){
+		// TODO Auto-generated catch block
+		e2.printStackTrace();
 		}
 		return isGetCapVers1;
 		

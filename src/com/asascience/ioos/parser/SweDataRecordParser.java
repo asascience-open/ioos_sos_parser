@@ -64,7 +64,7 @@ public class SweDataRecordParser extends BaseParser {
 	private final String timeTag = "Time";
 	private final String stationsStaticDataDef = "http://mmisw.org/ont/ioos/swe_element_type/stations";
 	private final String stationShortIdDefinition = "http://mmisw.org/ont/ioos/swe_element_type/station";
-	private final String stationIdDefinition ="http://mmisw.org/ont/ioos/swe_element_type/stationID";
+	private final String stationIdDefinition ="http://mmisw.org/ont/ioos/definition/stationID";
 	private final String latitudeCoordDefinition = "http://mmisw.org/ont/cf/parameter/latitude";
 	private final String longitudeCoordDefinition = "http://mmisw.org/ont/cf/parameter/longitude";
 	private final String zCoodDefinition = "http://mmisw.org/ont/cf/parameter/height";
@@ -72,7 +72,7 @@ public class SweDataRecordParser extends BaseParser {
 	private final String sensorObservationDefiniton = "http://mmisw.org/ont/ioos/swe_element_type/sensorObservations";
 	private final String sensorDefinition = "http://mmisw.org/ont/ioos/swe_element_type/sensor";
 	private final String sensorListDefintion = "http://mmisw.org/ont/ioos/swe_element_type/sensors";
-	private final String sensorIdDefintion = "http://mmisw.org/ont/ioos/swe_element_type/sensorID";
+	private final String sensorIdDefintion = "http://mmisw.org/ont/ioos/definition/sensorID";
 	private final String sensorOrientationDefinition = "http://www.opengis.net/def/property/OGC/0/SensorOrientation";
 	private final String sensorLocationDefinition = "http://www.opengis.net/def/property/OGC/0/SensorLocation";
 	private final String samplingTimeDefinition = "http://www.opengis.net/def/property/OGC/0/SamplingTime";
@@ -308,20 +308,15 @@ public class SweDataRecordParser extends BaseParser {
 							tempCoord.setCoordinateValue(null);
 							e.printStackTrace();
 						}
-						switch(coordDef){
 
-
-						case latitudeCoordDefinition:
+						if(coordDef.equals( latitudeCoordDefinition))
 							latCoord = tempCoord;
 
-							break;
-						case longitudeCoordDefinition:
+						else if(coordDef.equals( longitudeCoordDefinition))
 							lonCoord = tempCoord;
-							break;
-						case zCoodDefinition:
+						else if(coordDef.equals(zCoodDefinition))
 							zCoord = tempCoord;
-							break;
-						}
+						
 
 
 					}
