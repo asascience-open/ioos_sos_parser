@@ -33,10 +33,8 @@ public class SweDataRecordParser extends BaseParser {
 	private String decimalSeparator = ".";
 	private String tokenSeparator = ",";
 	private String blockSeparator = "\n";
-	private final String swe2NsTag = "swe2";
 	private final String idTag = "id";
-	private final String xlinkNsTag = "xlink";
-	private final String xsiNsTag = "xsi";
+
 	private final String textTag = "Text";
 	private final String axisIdTag = "axisID";
 	private final String itemTag = "item";
@@ -82,13 +80,25 @@ public class SweDataRecordParser extends BaseParser {
 	private final String profileBinsDefinition="http://mmisw.org/ont/ioos/swe_element_type/profileBins";
 	
 	
-	public SweDataRecordParser(String sweFileTypeStr){
+	public SweDataRecordParser(String sweFileTypeStr, BaseParser baseParser){
 		for(SweFileType type : SweFileType.values()){
 			if (type.getTypeName().equals(sweFileTypeStr)){
 				this.sweFileType = type;
 				break;
 			}
 		}
+		if(baseParser != null){
+			this.swe2Ns = baseParser.swe2Ns;
+			this.gmlNs = baseParser.gmlNs;
+			this.sweNs = baseParser.sweNs;
+			this.omNs = baseParser.omNs;
+			this.xsiNs = baseParser.xsiNs;
+			this.xlinkNs = baseParser.xlinkNs;
+			this.sosNs = baseParser.sosNs;
+			this.owsNs = baseParser.owsNs;
+			this.smlNs = baseParser.smlNs;
+		}
+
 	}
 	
 	public void parseSweDataRecord(String xmlFileName, MemberObservation memberObs) 
@@ -361,10 +371,7 @@ public class SweDataRecordParser extends BaseParser {
 
 	private void parseDynamicData(Element dynamicElem, SweDataRecord sweRecord){
 		if(dynamicElem != null){
-			String decimalSeparator = ".";
-			String tokenSeparator = ",";
-			String blockSeparator = "\n";
-			Integer dataRows = 0;
+			
 			Element dataArrayElem = dynamicElem.getChild(dataArrayTag, swe2Ns);
 			if(dataArrayElem != null &&
 			   sensorObsCollectionDynDataDef.equals(dataArrayElem.getAttributeValue(attDefinitionTag))){
@@ -373,7 +380,6 @@ public class SweDataRecordParser extends BaseParser {
 				// determine the number of rows in the data
 				List<QualityModel> elemQualRecords = parseElementCount(dataArrayElem.getChild(elementCountTag, swe2Ns), 
 						sweRecord);
-				sweRecord.setNumberDataRows(dataRows);
 				
 				// parse the observations record
 				parseElementTypeRecord(dataArrayElem.getChild(elementTypeTag, swe2Ns), sweRecord);
@@ -835,7 +841,7 @@ public class SweDataRecordParser extends BaseParser {
 	private void processDynamicSensorData(Element dataChoiceElem, SweDataRecord sweRecord){
 	
 		for(Element sensorItem : dataChoiceElem.getChildren(itemTag, swe2Ns)){
-			String sensorId = sensorItem.getAttributeValue(nameTag, swe2Ns);
+			String sensorId = sensorItem.getAttributeValue(nameTag);
 	
 			List<SensorProperty> sensorProperty = new ArrayList<SensorProperty>();
 			for(Element dataRecordElem : sensorItem.getChildren()){

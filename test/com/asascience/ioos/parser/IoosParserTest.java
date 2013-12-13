@@ -68,7 +68,7 @@ public class IoosParserTest {
 					 List<NetcdfFile> ncList;
 					 
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES ");
-					 sweParser = new SweDataRecordParser("timeSeries");
+					 sweParser = new SweDataRecordParser("timeSeries", null);
 					 sweParser.parseSweDataRecord(sweRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES ");
@@ -76,7 +76,7 @@ public class IoosParserTest {
 				
 					
 					 System.out.println("BEGIN GET OBSERVATION - MULTI QC TIME SERIES");
-					  sweParser = new SweDataRecordParser("timeSeries");
+					  sweParser = new SweDataRecordParser("timeSeries", null);
 					 sweParser.parseSweDataRecord(sweMultiQcRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTI QC TIME SERIES");
@@ -84,14 +84,14 @@ public class IoosParserTest {
 					 
 
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE QC TIME SERIES PROFILE");
-					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile", null);
 					 sweParser.parseSweDataRecord(sweSingleProfileQc, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE QC TIME SERIES PROFILE");
 
 
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
-					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile", null);
 					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");
@@ -100,11 +100,11 @@ public class IoosParserTest {
 
 				
 					 System.out.println("BEGIN GET OBSERVATION - MULTI TIME SERIES ");
-					 sweParser = new SweDataRecordParser("timeSeries");
+					 sweParser = new SweDataRecordParser("timeSeries", null);
 					 sweParser.parseSweDataRecord(sweMultiRecordFile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - MULTIE TIME SERIES ");
-
+					 
 					 ncCreate  = new CreateNetcdf(getObsModel);
 					 ncList =  ncCreate.generateNetcdf(timeSeriesOutput);
 					 for(NetcdfFile nc : ncList ){
@@ -115,7 +115,7 @@ public class IoosParserTest {
 					 ncCreate.closeNetcdfFiles();
 						
 					 System.out.println("BEGIN GET OBSERVATION - SINGLE TIME SERIES PROFILE");
-					 sweParser = new SweDataRecordParser("timeSeriesProfile");
+					 sweParser = new SweDataRecordParser("timeSeriesProfile", null);
 					 sweParser.parseSweDataRecord(sweSingleStationProfile, memObs.get(0));
 					 System.out.println(getObsModel.toString());
 					 System.out.println("END GET OBSERVATION - SINGLE TIME SERIES PROFILE");

@@ -108,7 +108,8 @@ public class GetObservationParser extends BaseParser {
 	private void parseResultRecord(Element resultElem, MemberObservation memberObs){
 		
 		if(resultElem != null){
-			SweDataRecordParser sweParser = new SweDataRecordParser(memberObs.getFeatureCollectionProperties().getFeatureType());
+			SweDataRecordParser sweParser = new SweDataRecordParser(
+					memberObs.getFeatureCollectionProperties().getFeatureType(), this);
 			sweParser.parseSweDataRecord(resultElem.getChild(swe2DataRecordTag, swe2Ns), memberObs);
 		}
 	}
